@@ -1,0 +1,320 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} — SolarLink Technical Data Sheet{% endblock %}
+{% block meta_description %}{{ product.name }} ({{ product.product_code }}) by {{ product.brand }}. View certified technical specifications, compliance certificates, and request export quotation.{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb Header -->
+<div style="background: #ffffff; border-bottom: 1px solid var(--border-subtle); padding: 1rem 0;">
+  <div class="container">
+    <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--slate-500);">
+      <a href="{% url 'pages:home' %}" style="color: var(--slate-500);">Home</a>
+      <span>/</span>
+      <a href="{% url 'catalog:list' %}" style="color: var(--slate-500);">Catalog</a>
+      <span>/</span>
+      <a href="{% url 'catalog:list' %}?category={{ product.category.slug }}" style="color: var(--slate-500);">{{ product.category.name }}</a>
+      <span>/</span>
+      <span style="color: var(--slate-800); font-weight: 600;">{{ product.name }}</span>
+    </nav>
+  </div>
+</div>
+
+<!-- Product Top Hero & Summary -->
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 3.5rem;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 380px; gap: 3.5rem; align-items: start;">
+      
+      <!-- Left: Title, Badges & Highlights -->
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem; flex-wrap: wrap;">
+          <span class="badge badge-primary">{{ product.category.name }}</span>
+          <span class="badge badge-neutral" style="font-family: var(--font-mono);">SKU: {{ product.product_code }}</span>
+          <span class="badge badge-sun">{{ product.brand }}</span>
+          {% if product.in_stock %}
+            <span class="status-badge status-won" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">
+              <span class="status-dot"></span> Export Stock Ready
+            </span>
+          {% endif %}
+        </div>
+
+        <h1 style="font-size: 2.4rem; line-height: 1.25; margin-bottom: 1rem; color: var(--slate-900);">
+          {{ product.name }}
+        </h1>
+
+        <p style="font-size: 1.15rem; color: var(--slate-600); line-height: 1.6; margin-bottom: 2rem;">
+          {{ product.full_description }}
+        </p>
+
+        <!-- Metric Highlight Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+          <div class="card" style="padding: 1rem; border-left: 4px solid var(--primary-600);">
+            <div style="font-size: 0.75rem; color: var(--slate-500); text-transform: uppercase; font-weight: 700;">Nominal Power</div>
+            <div style="font-size: 1.35rem; font-weight: 800; color: var(--slate-900); font-family: var(--font-heading); margin-top: 0.25rem;">
+              {{ product.display_power|default:'Custom Output' }}
+            </div>
+          </div>
+
+          <div class="card" style="padding: 1rem; border-left: 4px solid var(--accent-sun-500);">
+            <div style="font-size: 0.75rem; color: var(--slate-500); text-transform: uppercase; font-weight: 700;">Technology</div>
+            <div style="font-size: 1.05rem; font-weight: 700; color: var(--slate-900); font-family: var(--font-heading); margin-top: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              {{ product.technology_type|default:'Tier-1 Standard' }}
+            </div>
+          </div>
+
+          {% if warranty %}
+            <div class="card" style="padding: 1rem; border-left: 4px solid #0284c7;">
+              <div style="font-size: 0.75rem; color: var(--slate-500); text-transform: uppercase; font-weight: 700;">Product Warranty</div>
+              <div style="font-size: 1.35rem; font-weight: 800; color: var(--slate-900); font-family: var(--font-heading); margin-top: 0.25rem;">
+                {{ warranty.product_warranty_years }} Years
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Right: Commercial Action Card -->
+      <div class="card" style="padding: 2rem; box-shadow: var(--shadow-xl); border: 1px solid var(--border-strong);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--slate-500); text-transform: uppercase; font-weight: 700;">Commercial Inquiry</div>
+            <div style="font-size: 1.25rem; font-weight: 800; color: var(--primary-700);">B2B Export Pricing</div>
+          </div>
+          <span class="badge badge-sun">Factory Direct</span>
+        </div>
+
+        <p style="font-size: 0.875rem; color: var(--slate-600); margin-bottom: 1.5rem; line-height: 1.5;">
+          Export-ready container allocation, tailored Incoterms (FOB, CIF, DDP), and customized project volume discounts.
+        </p>
+
+        <a href="{% url 'enquiries:project' %}?product={{ product.id }}" class="btn btn-primary btn-block btn-lg" style="margin-bottom: 0.75rem;" id="detail-rfq-btn">
+          Request Commercial Quote &rarr;
+        </a>
+
+        {% if user.is_authenticated %}
+          <a href="{% url 'catalog:toggle_saved' product.id %}" class="btn btn-secondary btn-block" id="detail-save-btn">
+            {% if is_saved %}
+              <svg style="width:16px;height:16px;color:#ef4444;fill:#ef4444;" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              Saved in My Dashboard
+            {% else %}
+              <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+              Save to Wishlist
+            {% endif %}
+          </a>
+        {% else %}
+          <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn btn-secondary btn-block">
+            Sign In to Save Product
+          </a>
+        {% endif %}
+
+        <div style="margin-top: 1.5rem; font-size: 0.8rem; color: var(--slate-500); line-height: 1.6; border-top: 1px solid var(--border-subtle); padding-top: 1rem;">
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.4rem;">
+            <svg style="width:16px;height:16px;color:var(--primary-600);flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span>Verified TÜV / IEC / CE Quality Testing</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.4rem;">
+            <svg style="width:16px;height:16px;color:var(--primary-600);flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span>Full Container Load (FCL) Marine Packaging</span>
+          </div>
+          <div style="display: flex; gap: 0.5rem;">
+            <svg style="width:16px;height:16px;color:var(--primary-600);flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span>Direct Lead Assignment to Export Sales Desk</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Technical Content Sections -->
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+
+  <!-- Section 1: Dynamic Technical Specifications -->
+  <section style="margin-bottom: 3.5rem;" id="specs-section">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <div>
+        <h2 style="font-size: 1.6rem; margin-bottom: 0.25rem;">Technical Data Sheet & Electrical Specifications</h2>
+        <p style="margin-bottom: 0; color: var(--slate-500); font-size: 0.95rem;">Standard Test Conditions (STC: Irradiance 1000W/m², Cell Temp 25°C, AM 1.5)</p>
+      </div>
+      <span class="badge badge-primary">EAV Parameter Architecture</span>
+    </div>
+
+    {% if specifications %}
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="width: 35%;">Specification Attribute</th>
+              <th style="width: 25%;">Certified Value</th>
+              <th style="width: 15%;">Unit</th>
+              <th style="width: 25%;">Testing Definition / Scope</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for spec in specifications %}
+              <tr>
+                <td style="font-weight: 600; color: var(--slate-800);">
+                  {{ spec.attribute.name }}
+                </td>
+                <td style="font-weight: 700; color: var(--primary-700); font-family: var(--font-mono);">
+                  {{ spec.value }}
+                </td>
+                <td style="color: var(--slate-600);">
+                  {{ spec.attribute.unit|default:'—' }}
+                </td>
+                <td style="font-size: 0.825rem; color: var(--slate-500);">
+                  {{ spec.attribute.description|default:'Manufacturer factory rated parameter' }}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="card" style="padding: 2rem; text-align: center; color: var(--slate-500);">
+        Detailed technical parameters are being verified for this model.
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Section 2: Certifications & Compliance Standards -->
+  <section style="margin-bottom: 3.5rem;" id="certifications-section">
+    <div style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.6rem; margin-bottom: 0.25rem;">Quality Certifications & Regulatory Standards</h2>
+      <p style="margin-bottom: 0; color: var(--slate-500); font-size: 0.95rem;">Audited by accredited international testing bodies and European notified laboratories</p>
+    </div>
+
+    {% if certifications %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem;">
+        {% for cert in certifications %}
+          <div class="card" style="padding: 1.5rem; border-top: 3px solid var(--primary-600);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+              <span class="badge badge-primary">{{ cert.standard.name }}</span>
+              <span class="status-badge status-won" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">Valid Certificate</span>
+            </div>
+            <h4 style="font-size: 1.1rem; margin-bottom: 0.5rem;">{{ cert.title }}</h4>
+            <div style="font-size: 0.85rem; color: var(--slate-600); margin-bottom: 1rem;">
+              <div><strong>Certificate ID:</strong> <span style="font-family: var(--font-mono);">{{ cert.certificate_number }}</span></div>
+              <div><strong>Issuing Body:</strong> {{ cert.issuing_organization }}</div>
+              <div><strong>Valid Until:</strong> {{ cert.expiry_date|date:"F Y"|default:'Permanent / Ongoing' }}</div>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--slate-500); margin-bottom: 0;">
+              {{ cert.standard.description }}
+            </p>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="card" style="padding: 2rem; text-align: center; color: var(--slate-500);">
+        Certificates are archived and available through our compliance desk upon request.
+      </div>
+    {% endif %}
+  </section>
+
+  <!-- Section 3: Laboratory Test Reports -->
+  {% if lab_reports %}
+    <section style="margin-bottom: 3.5rem;" id="lab-reports-section">
+      <div style="margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.6rem; margin-bottom: 0.25rem;">Independent Laboratory Test Reports</h2>
+        <p style="margin-bottom: 0; color: var(--slate-500); font-size: 0.95rem;">Verified stress testing reports from TÜV Rheinland, PVEL, and UL Solutions</p>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Report ID</th>
+              <th>Testing Laboratory</th>
+              <th>Test Type / Protocol</th>
+              <th>Date Conducted</th>
+              <th>Verified Outcome</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for rep in lab_reports %}
+              <tr>
+                <td style="font-family: var(--font-mono); font-weight: 600; color: var(--slate-900);">{{ rep.report_number }}</td>
+                <td style="font-weight: 500;">{{ rep.testing_laboratory }}</td>
+                <td style="color: var(--slate-700);">{{ rep.test_type }}</td>
+                <td style="color: var(--slate-500);">{{ rep.test_date|date:"M Y" }}</td>
+                <td style="font-weight: 600; color: var(--primary-700);">{{ rep.result }}</td>
+                <td>
+                  <span class="badge badge-success">{{ rep.get_status_display }}</span>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- Section 4: Warranty Terms & Logistics -->
+  {% if warranty %}
+    <section style="margin-bottom: 4rem;" id="warranty-section">
+      <div class="card" style="padding: 2.5rem; background: linear-gradient(135deg, #ffffff 0%, var(--slate-50) 100%);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+          <div>
+            <span class="badge badge-sun" style="margin-bottom: 0.5rem;">Manufacturer Warranty Terms</span>
+            <h2 style="font-size: 1.6rem; margin-bottom: 0;">Comprehensive Tier-1 Guarantee</h2>
+          </div>
+          <div style="display: flex; gap: 1rem;">
+            <div style="background: #ffffff; border: 1px solid var(--border-subtle); padding: 0.6rem 1rem; border-radius: var(--radius-md); text-align: center;">
+              <div style="font-size: 0.72rem; color: var(--slate-500); text-transform: uppercase;">Product Build</div>
+              <div style="font-size: 1.2rem; font-weight: 800; color: var(--primary-700);">{{ warranty.product_warranty_years }} Years</div>
+            </div>
+            <div style="background: #ffffff; border: 1px solid var(--border-subtle); padding: 0.6rem 1rem; border-radius: var(--radius-md); text-align: center;">
+              <div style="font-size: 0.72rem; color: var(--slate-500); text-transform: uppercase;">Linear Performance</div>
+              <div style="font-size: 1.2rem; font-weight: 800; color: var(--accent-sun-600);">{{ warranty.performance_warranty_years }} Years</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; font-size: 0.9rem; line-height: 1.6;">
+          <div>
+            <h4 style="margin-bottom: 0.5rem; color: var(--slate-800);">Coverage Provisions</h4>
+            <p style="color: var(--slate-600);">{{ warranty.coverage_details }}</p>
+          </div>
+          <div>
+            <h4 style="margin-bottom: 0.5rem; color: var(--slate-800);">Recommended Operating Spectrum</h4>
+            <p style="color: var(--slate-600);">{{ warranty.operating_conditions|default:'Standard environmental parameters as defined by IEC 61215.' }}</p>
+            {% if warranty.exclusions %}
+              <h4 style="margin-bottom: 0.5rem; color: var(--slate-800); margin-top: 1rem;">Standard Exclusions</h4>
+              <p style="color: var(--slate-500); font-size: 0.85rem;">{{ warranty.exclusions }}</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </section>
+  {% endif %}
+
+  <!-- Related Equipment -->
+  {% if related_products %}
+    <section>
+      <div style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 1.4rem;">Related Equipment in {{ product.category.name }}</h3>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        {% for rel in related_products %}
+          <div class="card" style="padding: 1.25rem; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <span class="badge badge-neutral" style="font-size: 0.72rem; margin-bottom: 0.5rem;">{{ rel.brand }}</span>
+              <h4 style="font-size: 1.05rem; margin-bottom: 0.5rem;">
+                <a href="{% url 'catalog:detail' rel.slug %}">{{ rel.name }}</a>
+              </h4>
+              <p style="font-size: 0.825rem; color: var(--slate-500); line-height: 1.4;">
+                {{ rel.short_description|truncatewords:15 }}
+              </p>
+            </div>
+            <div style="margin-top: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 700; color: var(--primary-700); font-size: 0.9rem;">{{ rel.display_power|default:'Details' }}</span>
+              <a href="{% url 'catalog:detail' rel.slug %}" class="btn btn-outline btn-sm">Inspect Specs &rarr;</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+
+</div>
+{% endblock %}

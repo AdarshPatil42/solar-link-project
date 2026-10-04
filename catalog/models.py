@@ -5,7 +5,7 @@ from django.utils.text import slugify
 class Category(models.Model):
     name = models.CharField(max_length=120, unique=True)
     slug = models.SlugField(max_length=140, unique=True, blank=True)
-    icon_name = models.CharField(max_length=50, blank=True, default='sun', help_text='Icon identifier')
+    icon_name = models.CharField(max_length=50, blank=True, default='sun', help_text='Icon identifier (e.g. sun, zap, battery, tool, droplet)')
     description = models.TextField(blank=True, default='')
     is_active = models.BooleanField(default=True)
     sort_order = models.PositiveIntegerField(default=0)
@@ -23,6 +23,10 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def product_count(self):
+        return self.products.filter(is_active=True).count()
+
 
 class Product(models.Model):
     name = models.CharField(max_length=200)
@@ -31,11 +35,15 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products')
     brand = models.CharField(max_length=100)
     model_number = models.CharField(max_length=100, blank=True, default='')
+    technology_type = models.CharField(max_length=100, blank=True, default='', help_text='e.g. Mono PERC, Bifacial TopCon, LiFePO4, 3-Phase Hybrid')
+    power_watts = models.PositiveIntegerField(null=True, blank=True, help_text='Nominal power output in Watts (e.g. 550, 10000 for 10kW)')
     short_description = models.CharField(max_length=300)
     full_description = models.TextField()
     is_featured = models.BooleanField(default=False)
+    in_stock = models.BooleanField(default=True)
     is_active = models.BooleanField(default=True)
     thumbnail = models.ImageField(upload_to='products/', blank=True, null=True)
+    datasheet_pdf = models.FileField(upload_to='products/datasheets/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -50,7 +58,16 @@ class Product(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.name} ({self.product_code})"
+        return f"{self.brand} {self.name} ({self.product_code})"
+
+    @property
+    def display_power(self):
+        if not self.power_watts:
+            return None
+        if self.power_watts >= 1000:
+            kw = self.power_watts / 1000
+            return f"{kw:.1f} kW" if kw % 1 != 0 else f"{int(kw)} kW"
+        return f"{self.power_watts} W"
 
 
 class ProductImage(models.Model):

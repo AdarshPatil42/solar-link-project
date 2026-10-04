@@ -1,17 +1,291 @@
 {% extends 'base.html' %}
 
-{% block title %}Product Catalog — SolarLink{% endblock %}
+{% block title %}Solar & Renewable Equipment Catalog — SolarLink{% endblock %}
+{% block meta_description %}Explore export-ready tier-1 solar PV modules, hybrid inverters, commercial energy storage systems, and solar water pumps with verified technical specifications.{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
-  <div style="margin-bottom: 2rem;">
-    <h1>Product Catalog</h1>
-    <p>Browse tier-1 solar modules, inverters, lithium batteries, and renewable energy equipment.</p>
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <span class="badge badge-primary">Global Export Catalog</span>
+          <span style="font-size: 0.85rem; color: var(--slate-500);">Tier-1 Renewable Equipment</span>
+        </div>
+        <h1 style="font-size: 2.25rem; margin-bottom: 0.5rem;">Equipment Catalog & Technical Specs</h1>
+        <p style="margin-bottom: 0; color: var(--slate-600); max-width: 680px;">
+          Certified photovoltaic modules, hybrid string inverters, and utility battery storage systems ready for container export.
+        </p>
+      </div>
+
+      <!-- Quick Search Form -->
+      <form method="get" action="{% url 'catalog:list' %}" style="display: flex; gap: 0.5rem; width: 100%; max-width: 380px;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search model, SKU, brand, or spec..." class="form-control" style="border-radius: var(--radius-md);">
+        {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+        {% if selected_brand %}<input type="hidden" name="brand" value="{{ selected_brand }}">{% endif %}
+        {% if power_range %}<input type="hidden" name="power" value="{{ power_range }}">{% endif %}
+        <button type="submit" class="btn btn-primary" style="padding: 0.65rem 1rem;">
+          <svg style="width:18px;height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </button>
+      </form>
+    </div>
   </div>
-  <div class="card" style="padding: 3rem; text-align: center;">
-    <h3>Catalog Module</h3>
-    <p style="color: var(--slate-500);">Full product catalog, EAV dynamic specifications, and multi-dimensional search will be activated in Phase 2.</p>
-    <a href="{% url 'pages:home' %}" class="btn btn-secondary">Return to Home</a>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+  <div style="display: grid; grid-template-columns: 280px 1fr; gap: 2.5rem; align-items: start;">
+
+    <!-- ==========================================
+         FILTER SIDEBAR
+         ========================================== -->
+    <aside class="card" style="padding: 1.5rem; position: sticky; top: 5.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border-subtle);">
+        <h4 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <svg style="width:18px;height:18px;color:var(--primary-600);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
+          Filters
+        </h4>
+        {% if selected_category or selected_brand or power_range or q or in_stock_only %}
+          <a href="{% url 'catalog:list' %}" style="font-size: 0.8rem; color: var(--color-danger); font-weight: 600;">Reset All</a>
+        {% endif %}
+      </div>
+
+      <form method="get" action="{% url 'catalog:list' %}" id="catalog-filters-form">
+        {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+
+        <!-- Category Filter -->
+        <div style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="font-weight: 700; font-size: 0.825rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--slate-500);">
+            Equipment Category
+          </label>
+          <div style="display: flex; flex-direction: column; gap: 0.4rem; margin-top: 0.5rem;">
+            <a href="?{% if q %}q={{ q }}&{% endif %}{% if selected_brand %}brand={{ selected_brand }}&{% endif %}{% if power_range %}power={{ power_range }}&{% endif %}" 
+               style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem; {% if not selected_category %}background: var(--primary-100); color: var(--primary-900); font-weight: 700;{% else %}color: var(--slate-700);{% endif %}">
+              <span>All Equipment</span>
+              <span style="font-size: 0.75rem; background: rgba(0,0,0,0.06); padding: 0.1rem 0.45rem; border-radius: var(--radius-full);">{{ total_count }}</span>
+            </a>
+
+            {% for cat in categories %}
+              <a href="?category={{ cat.slug }}{% if q %}&q={{ q }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}{% if power_range %}&power={{ power_range }}{% endif %}"
+                 style="display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.9rem; {% if selected_category == cat.slug %}background: var(--primary-100); color: var(--primary-900); font-weight: 700;{% else %}color: var(--slate-700);{% endif %}">
+                <span>{{ cat.name }}</span>
+                <span style="font-size: 0.75rem; background: rgba(0,0,0,0.06); padding: 0.1rem 0.45rem; border-radius: var(--radius-full);">{{ cat.product_count }}</span>
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Power Rating Filter -->
+        <div style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="font-weight: 700; font-size: 0.825rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--slate-500);">
+            Power Rating
+          </label>
+          <select name="power" class="form-select" onchange="this.form.submit()" style="font-size: 0.875rem;">
+            <option value="">Any Power Range</option>
+            <option value="under_500" {% if power_range == 'under_500' %}selected{% endif %}>Under 500 Watts (Residential PV)</option>
+            <option value="500_650" {% if power_range == '500_650' %}selected{% endif %}>500W – 650W (Commercial Utility PV)</option>
+            <option value="over_650" {% if power_range == 'over_650' %}selected{% endif %}>Over 650W (Utility Grade)</option>
+            <option value="commercial_inverters" {% if power_range == 'commercial_inverters' %}selected{% endif %}>Commercial Inverters (10kW+)</option>
+          </select>
+        </div>
+
+        <!-- Brand Filter -->
+        <div style="margin-bottom: 1.5rem;">
+          <label class="form-label" style="font-weight: 700; font-size: 0.825rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--slate-500);">
+            Manufacturer / Brand
+          </label>
+          <select name="brand" class="form-select" onchange="this.form.submit()" style="font-size: 0.875rem;">
+            <option value="">All Tier-1 Brands</option>
+            {% for b in brands %}
+              <option value="{{ b }}" {% if selected_brand == b %}selected{% endif %}>{{ b }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Availability Toggle -->
+        <div style="margin-bottom: 1.5rem;">
+          <label style="display: flex; align-items: center; gap: 0.6rem; cursor: pointer; font-size: 0.875rem; color: var(--slate-700);">
+            <input type="checkbox" name="in_stock" value="1" {% if in_stock_only == '1' %}checked{% endif %} onchange="this.form.submit()" style="width: auto;">
+            <span>In-Stock / Export Ready only</span>
+          </label>
+        </div>
+      </form>
+    </aside>
+
+    <!-- ==========================================
+         PRODUCT LISTING & CONTROLS
+         ========================================== -->
+    <main>
+      <!-- Results Toolbar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+        <div style="font-size: 0.95rem; color: var(--slate-600);">
+          Showing <strong>{{ products|length }}</strong> of <strong>{{ total_count }}</strong> certified equipment models
+          {% if q %}<span style="color: var(--primary-700);"> for "{{ q }}"</span>{% endif %}
+        </div>
+
+        <!-- Sort Select -->
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 0.85rem; color: var(--slate-500);">Sort By:</span>
+          <form method="get" action="{% url 'catalog:list' %}">
+            {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+            {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+            {% if selected_brand %}<input type="hidden" name="brand" value="{{ selected_brand }}">{% endif %}
+            {% if power_range %}<input type="hidden" name="power" value="{{ power_range }}">{% endif %}
+            <select name="sort" class="form-select" onchange="this.form.submit()" style="padding: 0.35rem 0.75rem; font-size: 0.85rem; width: auto;">
+              <option value="featured" {% if sort == 'featured' %}selected{% endif %}>Featured Tier-1</option>
+              <option value="newest" {% if sort == 'newest' %}selected{% endif %}>Newest Additions</option>
+              <option value="power_desc" {% if sort == 'power_desc' %}selected{% endif %}>Power Output: High to Low</option>
+              <option value="name_asc" {% if sort == 'name_asc' %}selected{% endif %}>Product Name: A to Z</option>
+            </select>
+          </form>
+        </div>
+      </div>
+
+      <!-- Active Filter Tags -->
+      {% if selected_category or selected_brand or power_range or q or in_stock_only %}
+        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+          <span style="font-size: 0.8rem; color: var(--slate-500); font-weight: 600;">Active Filters:</span>
+          {% if selected_category %}
+            <span class="badge badge-neutral" style="gap: 0.4rem;">Category: {{ selected_category }}</span>
+          {% endif %}
+          {% if selected_brand %}
+            <span class="badge badge-neutral" style="gap: 0.4rem;">Brand: {{ selected_brand }}</span>
+          {% endif %}
+          {% if power_range %}
+            <span class="badge badge-neutral" style="gap: 0.4rem;">Power: {{ power_range }}</span>
+          {% endif %}
+          {% if in_stock_only == '1' %}
+            <span class="badge badge-success" style="gap: 0.4rem;">In-Stock Ready</span>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <!-- Products Grid -->
+      {% if products %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+          {% for product in products %}
+            <div class="card" style="display: flex; flex-direction: column; justify-content: space-between; border-radius: var(--radius-lg); position: relative;">
+              <!-- Header Badges -->
+              <div style="padding: 1.25rem 1.25rem 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <span class="badge badge-primary" style="font-size: 0.72rem;">{{ product.category.name }}</span>
+                {% if product.in_stock %}
+                  <span class="status-badge status-won" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;">
+                    <span class="status-dot"></span> In Stock
+                  </span>
+                {% else %}
+                  <span class="status-badge status-assigned" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;">
+                    Made to Order
+                  </span>
+                {% endif %}
+              </div>
+
+              <!-- Card Body Content -->
+              <div class="card-body" style="padding: 0.75rem 1.25rem 1.25rem;">
+                <div style="font-size: 0.8rem; color: var(--slate-500); font-weight: 600; text-transform: uppercase;">
+                  {{ product.brand }} • <span style="font-family: var(--font-mono);">{{ product.product_code }}</span>
+                </div>
+
+                <h3 style="font-size: 1.2rem; margin: 0.35rem 0 0.6rem; line-height: 1.35;">
+                  <a href="{% url 'catalog:detail' product.slug %}" style="color: var(--slate-900);">
+                    {{ product.name }}
+                  </a>
+                </h3>
+
+                <p style="font-size: 0.875rem; color: var(--slate-600); margin-bottom: 1rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                  {{ product.short_description }}
+                </p>
+
+                <!-- Key Attributes Pill Grid -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; background: var(--slate-50); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1rem;">
+                  <div>
+                    <div style="font-size: 0.72rem; color: var(--slate-500); text-transform: uppercase;">Power Rating</div>
+                    <div style="font-weight: 700; color: var(--primary-700); font-size: 0.95rem;">
+                      {{ product.display_power|default:'Technical Spec' }}
+                    </div>
+                  </div>
+                  <div>
+                    <div style="font-size: 0.72rem; color: var(--slate-500); text-transform: uppercase;">Technology</div>
+                    <div style="font-weight: 600; color: var(--slate-800); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                      {{ product.technology_type|default:'Standard Tier-1' }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Dynamic EAV Specs Preview (first 2 specs) -->
+                <div style="font-size: 0.8rem; color: var(--slate-600); margin-bottom: 0.5rem;">
+                  {% for spec in product.specifications.all|slice:":2" %}
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed var(--border-subtle); padding: 0.25rem 0;">
+                      <span style="color: var(--slate-500);">{{ spec.attribute.name }}:</span>
+                      <strong style="color: var(--slate-800);">{{ spec.value }}{% if spec.attribute.unit %} {{ spec.attribute.unit }}{% endif %}</strong>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Card Action Footer -->
+              <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1.25rem;">
+                <a href="{% url 'catalog:detail' product.slug %}" class="btn btn-outline btn-sm" style="flex: 1; margin-right: 0.5rem;">
+                  View Spec Sheet
+                </a>
+
+                {% if user.is_authenticated %}
+                  <a href="{% url 'catalog:toggle_saved' product.id %}" class="btn btn-secondary btn-sm" title="Save to Dashboard" style="padding: 0.4rem 0.6rem;">
+                    {% if product.id in saved_product_ids %}
+                      <svg style="width:16px;height:16px;color:#ef4444;fill:#ef4444;" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                      </svg>
+                    {% else %}
+                      <svg style="width:16px;height:16px;color:var(--slate-500);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                    {% endif %}
+                  </a>
+                {% endif %}
+
+                <a href="{% url 'enquiries:project' %}?product={{ product.id }}" class="btn btn-primary btn-sm" title="Request Quote">
+                  RFQ &rarr;
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination Controls -->
+        {% if page_obj.has_other_pages %}
+          <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 3.5rem;">
+            {% if page_obj.has_previous %}
+              <a href="?page={{ page_obj.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}{% if power_range %}&power={{ power_range }}{% endif %}" class="btn btn-secondary btn-sm">&larr; Previous</a>
+            {% endif %}
+
+            <span style="font-size: 0.9rem; color: var(--slate-600); padding: 0 0.75rem;">
+              Page <strong>{{ page_obj.number }}</strong> of <strong>{{ page_obj.paginator.num_pages }}</strong>
+            </span>
+
+            {% if page_obj.has_next %}
+              <a href="?page={{ page_obj.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}{% if power_range %}&power={{ power_range }}{% endif %}" class="btn btn-secondary btn-sm">Next &rarr;</a>
+            {% endif %}
+          </div>
+        {% endif %}
+
+      {% else %}
+        <!-- Empty State -->
+        <div class="card" style="padding: 4rem 2rem; text-align: center;">
+          <div class="brand-icon-wrapper" style="margin: 0 auto 1.5rem; background: var(--slate-200); color: var(--slate-600);">
+            <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <h3>No matching equipment found</h3>
+          <p style="color: var(--slate-500); max-width: 450px; margin: 0.5rem auto 1.5rem;">
+            We couldn't find any products matching your selected filters. Try broadening your power range or resetting filters.
+          </p>
+          <a href="{% url 'catalog:list' %}" class="btn btn-primary">Reset All Catalog Filters</a>
+        </div>
+      {% endif %}
+    </main>
   </div>
 </div>
 {% endblock %}

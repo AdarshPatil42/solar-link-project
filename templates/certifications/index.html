@@ -1,17 +1,164 @@
 {% extends 'base.html' %}
 
-{% block title %}Certifications & Compliance Standards — SolarLink{% endblock %}
+{% block title %}Quality Standards & Certifications Directory — SolarLink{% endblock %}
+{% block meta_description %}Explore verified international certifications (IEC 61215, IEC 61730, UL 1741, CE, ISO) and independent lab test reports from TÜV Rheinland and UL Solutions.{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
-  <div style="margin-bottom: 2rem;">
-    <h1>Compliance & Certifications Center</h1>
-    <p>International standard verification, quality certifications, and laboratory test reports.</p>
+<!-- Certifications Hero -->
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3.5rem 0 2.5rem;">
+  <div class="container">
+    <div style="max-width: 800px;">
+      <span class="badge badge-primary" style="margin-bottom: 0.75rem;">Quality & Regulatory Governance</span>
+      <h1 style="font-size: 2.5rem; line-height: 1.2; margin-bottom: 1rem;">
+        Compliance Standards & Certified Lab Reports
+      </h1>
+      <p style="font-size: 1.15rem; color: var(--slate-600); line-height: 1.6; margin-bottom: 0;">
+        SolarLink guarantees export conformity with global electrical safety, mechanical endurance, and environmental quality standards. Every product is backed by accredited test reports.
+      </p>
+    </div>
   </div>
-  <div class="card" style="padding: 3rem; text-align: center;">
-    <h3>Certifications Directory</h3>
-    <p style="color: var(--slate-500);">Full compliance standards (IEC, UL, CE, ISO), lab reports, and warranty documents will be loaded in Phase 2.</p>
-    <a href="{% url 'pages:home' %}" class="btn btn-secondary">Return to Home</a>
+</div>
+
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+
+  <!-- Category Filter Pills & Search -->
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.5rem;">
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <a href="{% url 'certifications:index' %}" class="btn {% if not selected_category %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+        All Standards
+      </a>
+      {% for cat_val, cat_label in categories %}
+        <a href="?category={{ cat_val }}" class="btn {% if selected_category == cat_val %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+          {{ cat_label }}
+        </a>
+      {% endfor %}
+    </div>
+
+    <form method="get" action="{% url 'certifications:index' %}" style="display: flex; gap: 0.5rem; max-width: 320px; width: 100%;">
+      <input type="text" name="q" value="{{ q }}" placeholder="Search standard or lab..." class="form-control" style="font-size: 0.875rem;">
+      {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+      <button type="submit" class="btn btn-primary btn-sm">Search</button>
+    </form>
   </div>
+
+  <!-- Compliance Standards Grid -->
+  <section style="margin-bottom: 4rem;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.75rem;">
+      {% for std in standards %}
+        <div class="card" style="padding: 1.75rem; border-top: 4px solid var(--primary-600); display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+              <span class="badge badge-sun" style="font-size: 0.72rem;">{{ std.get_category_display }}</span>
+              <span class="badge badge-neutral" style="font-size: 0.72rem;">{{ std.issuing_body }}</span>
+            </div>
+
+            <h3 style="font-size: 1.3rem; margin-bottom: 0.6rem; color: var(--slate-900);">{{ std.name }}</h3>
+            <p style="font-size: 0.9rem; color: var(--slate-600); line-height: 1.5; margin-bottom: 1.25rem;">
+              {{ std.description }}
+            </p>
+          </div>
+
+          <div>
+            <div style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--slate-500); margin-bottom: 0.4rem;">
+              Certificates & Verified Equipment:
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+              {% for cert in std.certifications.all %}
+                <div style="font-size: 0.825rem; color: var(--slate-700); background: var(--slate-50); padding: 0.4rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                  <strong style="font-family: var(--font-mono); color: var(--slate-900);">{{ cert.certificate_number }}</strong>
+                  {% for prod in cert.products.all %}
+                    <div style="margin-top: 0.2rem;">
+                      <a href="{% url 'catalog:detail' prod.slug %}" style="color: var(--primary-700); font-weight: 600;">
+                        &bull; {{ prod.name }}
+                      </a>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% empty %}
+                <span style="font-size: 0.8rem; color: var(--slate-400);">Applicable across general product lines</span>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="card" style="padding: 3rem; text-align: center; grid-column: 1 / -1;">
+          <h3>No standards found</h3>
+          <p style="color: var(--slate-500);">Try clearing your search query or choosing another category.</p>
+          <a href="{% url 'certifications:index' %}" class="btn btn-secondary">Reset Filters</a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Laboratory Test Reports Table -->
+  <section style="margin-bottom: 4rem;" id="lab-reports">
+    <div style="margin-bottom: 1.5rem;">
+      <span class="badge badge-sun" style="margin-bottom: 0.5rem;">Third-Party Audit Records</span>
+      <h2 style="font-size: 1.8rem; margin-bottom: 0.25rem;">Accredited Laboratory Test Reports</h2>
+      <p style="margin-bottom: 0; color: var(--slate-500); font-size: 0.95rem;">Full test data available to verified project developers and EPC tender buyers.</p>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Report ID</th>
+            <th>Equipment Name</th>
+            <th>Testing Organization</th>
+            <th>Stress Test Protocol</th>
+            <th>Test Date</th>
+            <th>Official Verdict</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rep in lab_reports %}
+            <tr>
+              <td style="font-family: var(--font-mono); font-weight: 700; color: var(--slate-900);">
+                {{ rep.report_number }}
+              </td>
+              <td>
+                <a href="{% url 'catalog:detail' rep.product.slug %}" style="font-weight: 600; color: var(--primary-700);">
+                  {{ rep.product.name }}
+                </a>
+              </td>
+              <td>{{ rep.testing_laboratory }}</td>
+              <td style="color: var(--slate-700); font-size: 0.875rem;">{{ rep.test_type }}</td>
+              <td style="color: var(--slate-500); font-size: 0.85rem;">{{ rep.test_date|date:"d M Y" }}</td>
+              <td>
+                <span class="status-badge status-won" style="font-size: 0.75rem;">
+                  <span class="status-dot"></span> {{ rep.result }}
+                </span>
+              </td>
+              <td>
+                <a href="{% url 'enquiries:project' %}?product={{ rep.product.id }}&subject=Lab+Report+{{ rep.report_number }}" class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">
+                  Request PDF
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Genuine Document Guarantee Callout -->
+  <section class="card" style="padding: 2.5rem; background: linear-gradient(135deg, var(--slate-900), var(--slate-800)); color: #ffffff;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem;">
+      <div style="max-width: 650px;">
+        <span class="badge badge-sun" style="margin-bottom: 0.75rem;">Integrity & Genuine Provenance</span>
+        <h2 style="color: #ffffff; font-size: 1.8rem; margin-bottom: 0.75rem;">Need Certified Copies for Customs or EPC Tenders?</h2>
+        <p style="color: var(--slate-300); font-size: 1rem; margin-bottom: 0; line-height: 1.6;">
+          Our export documentation department provides notarized copies of factory test reports, flash data curves, Certificate of Origin, and TÜV/UL certificates directly to project procurement teams.
+        </p>
+      </div>
+      <div>
+        <a href="{% url 'pages:contact' %}?subject=Certificate+Verification" class="btn btn-accent btn-lg">
+          Contact Compliance Desk &rarr;
+        </a>
+      </div>
+    </div>
+  </section>
+
 </div>
 {% endblock %}

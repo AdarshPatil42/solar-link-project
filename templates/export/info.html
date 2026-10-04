@@ -1,17 +1,179 @@
 {% extends 'base.html' %}
 
-{% block title %}Export Information & Shipping Logistics — SolarLink{% endblock %}
+{% block title %}International Export Logistics & Incoterms Guide — SolarLink{% endblock %}
+{% block meta_description %}Review SolarLink Incoterms (FOB, CIF, DDP, EXW), supported export container ports, and required international trade documentation checklists.{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
-  <div style="margin-bottom: 2rem;">
-    <h1>Export & Global Logistics</h1>
-    <p>International Incoterms, containerized shipping guidelines, and export documentation checklists.</p>
+<!-- Export Hero -->
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3.5rem 0 2.5rem;">
+  <div class="container">
+    <div style="max-width: 800px;">
+      <span class="badge badge-sun" style="margin-bottom: 0.75rem;">Global Supply Chain & Logistics</span>
+      <h1 style="font-size: 2.5rem; line-height: 1.2; margin-bottom: 1rem;">
+        Export Terms, Incoterms & Trade Compliance
+      </h1>
+      <p style="font-size: 1.15rem; color: var(--slate-600); line-height: 1.6; margin-bottom: 0;">
+        Clear, transparent international trade terms for utility-scale developers and distributors. We manage container ocean freight, moisture-proof export packaging, and customs clearance protocols worldwide.
+      </p>
+    </div>
   </div>
-  <div class="card" style="padding: 3rem; text-align: center;">
-    <h3>Export Information Hub</h3>
-    <p style="color: var(--slate-500);">Incoterms (EXW, FOB, CFR, CIF, DAP, DDP), countries served, and export document templates will be active in Phase 2.</p>
-    <a href="{% url 'pages:home' %}" class="btn btn-secondary">Return to Home</a>
-  </div>
+</div>
+
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+
+  <!-- Section 1: Incoterms Master Matrix -->
+  <section style="margin-bottom: 4.5rem;" id="incoterms">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <span class="badge badge-primary" style="margin-bottom: 0.4rem;">Commercial Delivery Terms</span>
+        <h2 style="font-size: 1.8rem; margin-bottom: 0.25rem;">Incoterms 2020 Commercial Matrix</h2>
+        <p style="margin-bottom: 0; color: var(--slate-500); font-size: 0.95rem;">Clear division of shipping costs, insurance coverage, and risk transfer between exporter and buyer.</p>
+      </div>
+      <div>
+        <span class="status-badge status-won" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">
+          <span class="status-dot"></span> Recommended by SolarLink: FOB, CIF, DDP
+        </span>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.75rem;">
+      {% for term in shipping_terms %}
+        <div class="card" style="padding: 1.75rem; border-top: 4px solid {% if term.is_recommended %}var(--primary-600){% else %}var(--slate-300){% endif %}; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <span style="font-size: 1.35rem; font-weight: 800; font-family: var(--font-heading); color: var(--slate-900);">
+                {{ term.incoterm }}
+              </span>
+              {% if term.is_recommended %}
+                <span class="badge badge-primary">Recommended</span>
+              {% endif %}
+            </div>
+
+            <h4 style="font-size: 1.05rem; margin-bottom: 0.75rem; color: var(--slate-800);">{{ term.title }}</h4>
+
+            <div style="font-size: 0.875rem; line-height: 1.5; margin-bottom: 1.25rem;">
+              <div style="margin-bottom: 0.75rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--primary-700); text-transform: uppercase;">SolarLink (Seller) Obligation</div>
+                <div style="color: var(--slate-600);">{{ term.seller_responsibility }}</div>
+              </div>
+
+              <div style="margin-bottom: 0.75rem;">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Buyer Obligation</div>
+                <div style="color: var(--slate-600);">{{ term.buyer_responsibility }}</div>
+              </div>
+
+              <div style="background: var(--slate-50); padding: 0.75rem; border-radius: var(--radius-md); border-left: 3px solid var(--accent-sun-500);">
+                <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-700); text-transform: uppercase;">Risk Transfer Point</div>
+                <div style="color: var(--slate-700); font-size: 0.825rem;">{{ term.risk_transfer_point }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.8rem; color: var(--slate-500); border-top: 1px solid var(--border-subtle); padding-top: 0.75rem;">
+            <div><strong>Min Order:</strong> {{ term.minimum_order }}</div>
+            <div><strong>Est. Transit:</strong> {{ term.estimated_transit_days }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Section 2: Destination Countries & Regional Logistics -->
+  <section style="margin-bottom: 4.5rem;" id="destinations">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <span class="badge badge-sun" style="margin-bottom: 0.4rem;">Global Destination Ports</span>
+        <h2 style="font-size: 1.8rem; margin-bottom: 0.25rem;">Export Destinations & Regional Guidelines</h2>
+        <p style="margin-bottom: 0; color: var(--slate-500); font-size: 0.95rem;">Pre-configured trade documentation and expedited customs protocols by destination country.</p>
+      </div>
+
+      <!-- Regional Filter Tabs -->
+      <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="{% url 'exports:info' %}#destinations" class="btn {% if not selected_region %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+          All Regions
+        </a>
+        {% for reg in regions %}
+          <a href="?region={{ reg }}#destinations" class="btn {% if selected_region == reg %}btn-primary{% else %}btn-secondary{% endif %} btn-sm">
+            {{ reg }}
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
+      {% for country in countries %}
+        <div class="card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span style="font-size: 2rem;">{{ country.flag_emoji }}</span>
+              <span class="badge badge-neutral">{{ country.code }}</span>
+            </div>
+
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.25rem;">{{ country.name }}</h3>
+            <div style="font-size: 0.8rem; color: var(--primary-700); font-weight: 600; margin-bottom: 0.75rem;">
+              {{ country.region }}
+            </div>
+
+            <div style="font-size: 0.85rem; color: var(--slate-600); margin-bottom: 0.75rem;">
+              <strong style="color: var(--slate-800);">Major Ports:</strong> {{ country.primary_ports }}
+            </div>
+
+            {% if country.customs_notes %}
+              <div style="font-size: 0.8rem; color: var(--slate-500); background: var(--slate-50); padding: 0.6rem; border-radius: var(--radius-sm); line-height: 1.4;">
+                {{ country.customs_notes }}
+              </div>
+            {% endif %}
+          </div>
+
+          <div style="margin-top: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem;">
+            <a href="{% url 'enquiries:project' %}?country={{ country.name }}" class="btn btn-outline btn-sm btn-block">
+              Request Delivery to {{ country.name }} &rarr;
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Section 3: Export Documentation Checklist -->
+  <section style="margin-bottom: 4rem;" id="documents">
+    <div style="margin-bottom: 1.75rem;">
+      <span class="badge badge-primary" style="margin-bottom: 0.4rem;">International Trade Compliance</span>
+      <h2 style="font-size: 1.8rem; margin-bottom: 0.25rem;">Export Documentation Checklist</h2>
+      <p style="margin-bottom: 0; color: var(--slate-500); font-size: 0.95rem;">Every international shipment includes a complete certified trade documentation envelope.</p>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Document Name</th>
+            <th style="width: 15%;">Document Code</th>
+            <th style="width: 35%;">Purpose in Customs & Trade Settlement</th>
+            <th style="width: 15%;">Issuing Party</th>
+            <th style="width: 10%;">Requirement</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for doc in export_docs %}
+            <tr>
+              <td style="font-weight: 700; color: var(--slate-900);">{{ doc.name }}</td>
+              <td style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--slate-600);">{{ doc.code }}</td>
+              <td style="font-size: 0.875rem; color: var(--slate-600); line-height: 1.5;">{{ doc.purpose }}</td>
+              <td style="font-size: 0.85rem; color: var(--slate-700);">{{ doc.issuing_party }}</td>
+              <td>
+                {% if doc.is_mandatory %}
+                  <span class="badge badge-success" style="font-size: 0.72rem;">Mandatory</span>
+                {% else %}
+                  <span class="badge badge-neutral" style="font-size: 0.72rem;">Optional</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
 </div>
 {% endblock %}
