@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block title %}Assigned Leads Queue — SolarLink Sales{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.5rem;">
+          <a href="{% url 'sales:dashboard' %}">Sales Workspace</a>
+          <span>/</span>
+          <span style="color: var(--slate-800); font-weight: 600;">Assigned Leads Queue</span>
+        </nav>
+        <h1 style="font-size: 2.25rem; margin: 0;">Assigned Leads &amp; RFQs</h1>
+      </div>
+      <a href="{% url 'sales:pipeline' %}" class="btn btn-primary">
+        Switch to Pipeline Kanban &rarr;
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  <!-- Search & Filter Controls -->
+  <div class="card" style="padding: 1.25rem 1.5rem; margin-bottom: 2rem;">
+    <form method="get" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+      <div style="flex: 1; min-width: 250px;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by lead ref, project name, company, or buyer country..." class="form-control" style="width: 100%;">
+      </div>
+      
+      <div style="width: 230px;">
+        <select name="status" class="form-select" style="width: 100%;" onchange="this.form.submit()">
+          <option value="">All Deal Stages</option>
+          {% for code, label in status_choices %}
+            <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <button type="submit" class="btn btn-secondary">Filter</button>
+        {% if q or selected_status %}
+          <a href="{% url 'sales:enquiries' %}" class="btn btn-outline" title="Reset Filters">Reset</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Leads Table -->
+  {% if leads %}
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="table-responsive">
+        <table class="table" style="margin: 0;">
+          <thead>
+            <tr>
+              <th>Lead Ref</th>
+              <th>Buyer / Company</th>
+              <th>Project Name &amp; Capacity</th>
+              <th>Country &amp; Incoterm</th>
+              <th>Current Stage</th>
+              <th>Submitted</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for lead in leads %}
+              <tr>
+                <td>
+                  <strong style="color: var(--primary-700); font-family: monospace;">{{ lead.enquiry_number }}</strong>
+                </td>
+                <td>
+                  <div style="font-weight: 600; color: var(--slate-900);">{{ lead.company_name|default:lead.full_name }}</div>
+                  <div style="font-size: 0.8rem; color: var(--slate-500);">
+                    {{ lead.full_name }} &bull; {{ lead.email }}
+                  </div>
+                </td>
+                <td>
+                  <div style="font-weight: 600; color: var(--slate-900);">{{ lead.project_name }}</div>
+                  <div style="font-size: 0.75rem; color: var(--slate-500);">
+                    {{ lead.estimated_capacity|default:'Scope unspecified' }} &bull; {{ lead.items.count }} BOM item{{ lead.items.count|pluralize }}
+                  </div>
+                </td>
+                <td>
+                  <div>{{ lead.shipping_destination|default:lead.country }}</div>
+                  <span class="badge badge-secondary" style="font-size: 0.75rem;">{{ lead.preferred_incoterm|default:'CIF' }}</span>
+                </td>
+                <td>
+                  {% if lead.status == 'REQUESTED' %}
+                    <span class="badge badge-secondary">New / Unreviewed</span>
+                  {% elif lead.status == 'ASSIGNED' %}
+                    <span class="badge badge-primary">Assigned</span>
+                  {% elif lead.status == 'UNDER_REVIEW' %}
+                    <span class="badge badge-warning">Technical Review</span>
+                  {% elif lead.status == 'QUOTATION_PREPARED' %}
+                    <span class="badge badge-warning">Quote Prepared</span>
+                  {% elif lead.status == 'QUOTATION_SENT' %}
+                    <span class="badge badge-primary" style="background: #0284c7; color: white;">Quote Sent</span>
+                  {% elif lead.status == 'NEGOTIATION' %}
+                    <span class="badge badge-warning" style="background: #eab308; color: #713f12;">Negotiating</span>
+                  {% elif lead.status == 'APPROVED' %}
+                    <span class="badge badge-success">Won / Approved</span>
+                  {% elif lead.status == 'REJECTED' %}
+                    <span class="badge badge-danger">Declined</span>
+                  {% else %}
+                    <span class="badge badge-secondary">{{ lead.get_status_display }}</span>
+                  {% endif %}
+                </td>
+                <td style="font-size: 0.85rem; color: var(--slate-500);">
+                  {{ lead.created_at|date:"d M Y" }}
+                </td>
+                <td style="text-align: right;">
+                  <a href="{% url 'sales:enquiry_detail' lead.id %}" class="btn btn-primary btn-sm">
+                    Manage Lead &rarr;
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="card" style="padding: 4rem 2rem; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+      <h3 style="margin-bottom: 0.5rem;">No leads found in this view</h3>
+      <p style="color: var(--slate-500); max-width: 450px; margin: 0 auto 1.5rem;">
+        {% if q or selected_status %}
+          No leads match your filter parameters. Try clearing filters to view all assigned leads.
+        {% else %}
+          You have no active leads assigned. Incoming RFQs will be routed to your queue.
+        {% endif %}
+      </p>
+      {% if q or selected_status %}
+        <a href="{% url 'sales:enquiries' %}" class="btn btn-secondary">Clear Filters</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

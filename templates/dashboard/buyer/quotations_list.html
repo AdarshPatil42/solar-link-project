@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Commercial Quotations — SolarLink Portal{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.5rem;">
+          <a href="{% url 'dashboard:buyer_dashboard' %}">Dashboard</a>
+          <span>/</span>
+          <span style="color: var(--slate-800); font-weight: 600;">Quotations</span>
+        </nav>
+        <h1 style="font-size: 2.25rem; margin: 0;">Commercial Quotations</h1>
+      </div>
+      <a href="{% url 'enquiries:project' %}" class="btn btn-secondary">
+        + New Project Enquiry
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  {% if quotations %}
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="table-responsive">
+        <table class="table" style="margin: 0;">
+          <thead>
+            <tr>
+              <th>Quote Number</th>
+              <th>Enquiry Ref &amp; Project</th>
+              <th>Total Amount</th>
+              <th>Incoterm</th>
+              <th>Payment Terms</th>
+              <th>Valid Until</th>
+              <th>Status</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for quote in quotations %}
+              <tr>
+                <td>
+                  <strong style="color: var(--primary-700); font-family: monospace; font-size: 1rem;">
+                    {{ quote.quote_number }}
+                  </strong>
+                  <div style="font-size: 0.75rem; color: var(--slate-400);">Issued {{ quote.created_at|date:"d M Y" }}</div>
+                </td>
+                <td>
+                  <div style="font-weight: 600; color: var(--slate-900);">
+                    <a href="{% url 'dashboard:buyer_enquiry_detail' quote.enquiry.id %}" style="color: var(--slate-800);">
+                      {{ quote.enquiry.project_name }}
+                    </a>
+                  </div>
+                  <div style="font-size: 0.8rem; font-family: monospace; color: var(--slate-500);">
+                    {{ quote.enquiry.enquiry_number }}
+                  </div>
+                </td>
+                <td>
+                  <strong style="font-size: 1.15rem; color: var(--slate-900); font-family: var(--font-heading);">
+                    {{ quote.currency }} {{ quote.total_amount|floatformat:2 }}
+                  </strong>
+                </td>
+                <td>
+                  <span class="badge badge-secondary">{{ quote.incoterm }}</span>
+                </td>
+                <td style="font-size: 0.825rem; color: var(--slate-600); max-width: 200px;">
+                  {{ quote.payment_terms|truncatewords:8 }}
+                </td>
+                <td>
+                  <div style="font-size: 0.875rem; font-weight: 600; color: {% if quote.status == 'SENT' %}var(--color-danger){% else %}var(--slate-600){% endif %};">
+                    {{ quote.valid_until|date:"d M Y" }}
+                  </div>
+                </td>
+                <td>
+                  {% if quote.status == 'SENT' %}
+                    <span class="badge badge-primary" style="background: #0284c7; color: white;">Awaiting Review</span>
+                  {% elif quote.status == 'ACCEPTED' %}
+                    <span class="badge badge-success">Accepted &amp; Won</span>
+                  {% elif quote.status == 'NEGOTIATING' %}
+                    <span class="badge badge-warning" style="background: #eab308; color: #713f12;">In Negotiation</span>
+                  {% elif quote.status == 'DECLINED' %}
+                    <span class="badge badge-danger">Declined</span>
+                  {% else %}
+                    <span class="badge badge-secondary">{{ quote.get_status_display }}</span>
+                  {% endif %}
+                </td>
+                <td style="text-align: right;">
+                  <a href="{% url 'dashboard:buyer_quotation_detail' quote.id %}" class="btn btn-primary btn-sm">
+                    Review &amp; Decide &rarr;
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="card" style="padding: 4rem 2rem; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">📄</div>
+      <h3 style="margin-bottom: 0.5rem;">No commercial quotations yet</h3>
+      <p style="color: var(--slate-500); max-width: 480px; margin: 0 auto 1.5rem;">
+        When our export sales desk prepares an official commercial proforma quotation for your project enquiry, it will appear here for your review, counter-offer, or formal acceptance.
+      </p>
+      <a href="{% url 'dashboard:buyer_enquiries' %}" class="btn btn-primary">Check Enquiry Milestones</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

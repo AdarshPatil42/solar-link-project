@@ -99,6 +99,31 @@ class Enquiry(models.Model):
         }
         return status_map.get(self.status, 1)
 
+    @property
+    def application_type(self):
+        return self.project_type
+
+    @property
+    def get_application_type_display(self):
+        return self.get_project_type_display()
+
+    @property
+    def estimated_capacity(self):
+        return self.required_capacity
+
+    @property
+    def target_delivery_date(self):
+        return self.expected_delivery_date
+
+    @property
+    def description(self):
+        return self.message
+
+    @property
+    def phone_number(self):
+        return self.phone
+
+
 
 class EnquiryItem(models.Model):
     enquiry = models.ForeignKey(Enquiry, on_delete=models.CASCADE, related_name='items')
@@ -122,6 +147,10 @@ class EnquiryStatusHistory(models.Model):
     changed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     comment = models.TextField(blank=True, default='')
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def created_at(self):
+        return self.timestamp
 
     class Meta:
         ordering = ['-timestamp']
@@ -182,6 +211,10 @@ class QuotationItem(models.Model):
     def save(self, *args, **kwargs):
         self.subtotal = self.unit_price * self.quantity
         super().save(*args, **kwargs)
+
+    @property
+    def total_price(self):
+        return self.subtotal
 
     def __str__(self):
         return f"{self.quantity}x {self.product.name} @ ${self.unit_price}"

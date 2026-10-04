@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Issued Commercial Quotations — SolarLink Sales{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.5rem;">
+          <a href="{% url 'sales:dashboard' %}">Sales Workspace</a>
+          <span>/</span>
+          <span style="color: var(--slate-800); font-weight: 600;">Quotations Archive</span>
+        </nav>
+        <h1 style="font-size: 2.25rem; margin: 0;">Issued Commercial Quotations</h1>
+      </div>
+      <a href="{% url 'sales:pipeline' %}" class="btn btn-primary">
+        Deal Pipeline &rarr;
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  {% if quotes %}
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="table-responsive">
+        <table class="table" style="margin: 0;">
+          <thead>
+            <tr>
+              <th>Quote Ref</th>
+              <th>Lead / Project Name</th>
+              <th>Client / Destination</th>
+              <th>Value</th>
+              <th>Incoterm</th>
+              <th>Valid Until</th>
+              <th>Status</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for q in quotes %}
+              <tr>
+                <td>
+                  <strong style="color: var(--primary-700); font-family: monospace; font-size: 0.95rem;">
+                    {{ q.quote_number }}
+                  </strong>
+                  <div style="font-size: 0.75rem; color: var(--slate-400);">{{ q.created_at|date:"d M Y" }}</div>
+                </td>
+                <td>
+                  <div style="font-weight: 600; color: var(--slate-900);">{{ q.enquiry.project_name }}</div>
+                  <div style="font-size: 0.8rem; font-family: monospace; color: var(--slate-500);">
+                    {{ q.enquiry.enquiry_number }}
+                  </div>
+                </td>
+                <td>
+                  <div style="font-weight: 600; color: var(--slate-800);">{{ q.enquiry.company_name|default:q.enquiry.full_name }}</div>
+                  <div style="font-size: 0.75rem; color: var(--slate-500);">{{ q.enquiry.shipping_destination|default:q.enquiry.country }}</div>
+                </td>
+                <td>
+                  <strong style="font-size: 1.1rem; color: var(--slate-900); font-family: var(--font-heading);">
+                    {{ q.currency }} {{ q.total_amount|floatformat:2 }}
+                  </strong>
+                </td>
+                <td>
+                  <span class="badge badge-secondary">{{ q.incoterm }}</span>
+                </td>
+                <td style="font-size: 0.85rem; color: var(--slate-600);">
+                  {{ q.valid_until|date:"d M Y" }}
+                </td>
+                <td>
+                  {% if q.status == 'SENT' %}
+                    <span class="badge badge-primary" style="background: #0284c7; color: white;">Sent &bull; Pending</span>
+                  {% elif q.status == 'ACCEPTED' %}
+                    <span class="badge badge-success">Won / Accepted</span>
+                  {% elif q.status == 'NEGOTIATING' %}
+                    <span class="badge badge-warning" style="background: #eab308; color: #713f12;">Negotiating</span>
+                  {% elif q.status == 'DECLINED' %}
+                    <span class="badge badge-danger">Declined</span>
+                  {% else %}
+                    <span class="badge badge-secondary">{{ q.get_status_display }}</span>
+                  {% endif %}
+                </td>
+                <td style="text-align: right;">
+                  <a href="{% url 'sales:quotation_detail' q.id %}" class="btn btn-secondary btn-sm">
+                    Inspect Quote &rarr;
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="card" style="padding: 4rem 2rem; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">📑</div>
+      <h3 style="margin-bottom: 0.5rem;">No commercial quotations issued yet</h3>
+      <p style="color: var(--slate-500); max-width: 450px; margin: 0 auto 1.5rem;">
+        When you generate proforma pricing for your assigned enquiries, quotations will be organized here.
+      </p>
+      <a href="{% url 'sales:enquiries' %}" class="btn btn-primary">Go to Lead Queue</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

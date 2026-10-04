@@ -1,0 +1,298 @@
+{% extends 'base.html' %}
+
+{% block title %}Quotation {{ quotation.quote_number }} — SolarLink Portal{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 2.5rem 0 1.5rem;" class="no-print">
+  <div class="container">
+    <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.5rem;">
+      <a href="{% url 'dashboard:buyer_dashboard' %}">Dashboard</a>
+      <span>/</span>
+      <a href="{% url 'dashboard:buyer_quotations' %}">Quotations</a>
+      <span>/</span>
+      <span style="color: var(--slate-800); font-weight: 600;">{{ quotation.quote_number }}</span>
+    </nav>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2.25rem; margin: 0;">Commercial Quotation Review</h1>
+        <p style="margin: 0.25rem 0 0; color: var(--slate-600);">
+          Project: <strong>{{ enquiry.project_name }}</strong> &bull; Ref: {{ enquiry.enquiry_number }}
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <button onclick="window.print()" class="btn btn-secondary">
+          🖨️ Print / Save PDF
+        </button>
+        <a href="{% url 'dashboard:buyer_quotations' %}" class="btn btn-outline">
+          &larr; Back to Quotations
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  <!-- Proforma Quotation Sheet Card -->
+  <div class="card" style="padding: 3rem; margin-bottom: 2.5rem; box-shadow: var(--shadow-lg); background: #ffffff;" id="printable-quote">
+    
+    <!-- Header of Proforma Quotation -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--primary-600); padding-bottom: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;">
+      <div>
+        <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-heading); color: var(--primary-700); letter-spacing: -0.02em;">
+          SOLAR<span style="color: var(--accent-sun-500);">LINK</span> EXPORTS
+        </div>
+        <div style="font-size: 0.85rem; color: var(--slate-500); margin-top: 0.25rem;">
+          International Clean Energy Trade &amp; Engineering Desk<br>
+          ISO 9001:2015 &bull; IEC Certified Global Logistics Hub<br>
+          export-desk@solarlink-energy.com &bull; +971 4 800 SOLAR
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <div style="font-size: 1.5rem; font-weight: 800; color: var(--slate-900); font-family: monospace;">
+          {{ quotation.quote_number }}
+        </div>
+        <div style="font-size: 0.85rem; color: var(--slate-600); margin-top: 0.25rem;">
+          Issue Date: <strong>{{ quotation.created_at|date:"d M Y" }}</strong><br>
+          Valid Until: <strong style="color: var(--color-danger);">{{ quotation.valid_until|date:"d M Y" }}</strong>
+        </div>
+        <div style="margin-top: 0.5rem;">
+          {% if quotation.status == 'SENT' %}
+            <span class="badge badge-primary" style="background: #0284c7; color: white;">Official Offer &bull; Pending Buyer Decision</span>
+          {% elif quotation.status == 'ACCEPTED' %}
+            <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">✓ Confirmed &amp; Accepted</span>
+          {% elif quotation.status == 'NEGOTIATING' %}
+            <span class="badge badge-warning" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">In Commercial Negotiation</span>
+          {% elif quotation.status == 'DECLINED' %}
+            <span class="badge badge-danger">Declined</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Parties Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2.5rem; background: var(--slate-50); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+      <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase; margin-bottom: 0.5rem;">Buyer / Consignee</div>
+        <div style="font-weight: 700; font-size: 1.05rem; color: var(--slate-900);">{{ enquiry.company_name|default:enquiry.full_name }}</div>
+        <div style="font-size: 0.85rem; color: var(--slate-600); line-height: 1.6; margin-top: 0.25rem;">
+          Attn: {{ enquiry.full_name }}<br>
+          Email: {{ enquiry.email }}<br>
+          Phone/WhatsApp: {{ enquiry.phone_number }}<br>
+          Country: <strong>{{ enquiry.country }}</strong>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase; margin-bottom: 0.5rem;">Delivery &amp; Trade Terms</div>
+        <div style="font-size: 0.85rem; color: var(--slate-600); line-height: 1.6;">
+          Incoterms 2020: <strong style="color: var(--primary-700); font-size: 1rem;">{{ quotation.incoterm }}</strong><br>
+          Discharge Port: <strong>{{ enquiry.shipping_destination|default:enquiry.country }}</strong><br>
+          Payment Terms: <strong>{{ quotation.payment_terms }}</strong><br>
+          Account Executive: <strong>{{ quotation.sales_rep.get_full_name|default:quotation.sales_rep.username }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Line Items Table -->
+    <div class="table-responsive" style="margin-bottom: 2rem;">
+      <table class="table" style="margin: 0;">
+        <thead style="background: var(--slate-100);">
+          <tr>
+            <th style="width: 5%;">#</th>
+            <th style="width: 50%;">Description / Equipment Specification</th>
+            <th style="width: 15%; text-align: center;">Quantity</th>
+            <th style="width: 15%; text-align: right;">Unit Price ({{ quotation.currency }})</th>
+            <th style="width: 15%; text-align: right;">Total Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in items %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>
+                <div style="font-weight: 700; color: var(--slate-900);">{{ item.product.name }}</div>
+                <div style="font-size: 0.8rem; color: var(--slate-500);">
+                  {{ item.product.brand }} &bull; SKU: {{ item.product.product_code }} &bull; {{ item.specifications_summary }}
+                </div>
+              </td>
+              <td style="text-align: center; font-weight: 600;">
+                {{ item.quantity }} units
+              </td>
+              <td style="text-align: right; font-family: monospace;">
+                ${{ item.unit_price|floatformat:2 }}
+              </td>
+              <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--slate-900);">
+                ${{ item.total_price|floatformat:2 }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td>1</td>
+              <td>
+                <div style="font-weight: 700; color: var(--slate-900);">Turnkey Equipment Package — {{ enquiry.project_name }}</div>
+                <div style="font-size: 0.8rem; color: var(--slate-500);">Complete solar equipment procurement scope as detailed in RFQ {{ enquiry.enquiry_number }}</div>
+              </td>
+              <td style="text-align: center; font-weight: 600;">1 lot</td>
+              <td style="text-align: right; font-family: monospace;">${{ quotation.total_amount|floatformat:2 }}</td>
+              <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--slate-900);">${{ quotation.total_amount|floatformat:2 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Commercial Grand Total Summary -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 2rem;">
+      <div style="width: 360px; background: var(--slate-50); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+          <span style="color: var(--slate-600);">Equipment Subtotal:</span>
+          <span style="font-weight: 600;">{{ quotation.currency }} {{ quotation.total_amount|floatformat:2 }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+          <span style="color: var(--slate-600);">Freight &amp; Marine Cargo:</span>
+          <span style="font-weight: 600; color: var(--primary-700);">Included ({{ quotation.incoterm }})</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.9rem;">
+          <span style="color: var(--slate-600);">Pre-Shipment IEC Inspection:</span>
+          <span style="font-weight: 600; color: var(--primary-700);">Included</span>
+        </div>
+        <div style="border-top: 2px solid var(--slate-300); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: baseline;">
+          <strong style="font-size: 1.1rem; color: var(--slate-900);">Total ({{ quotation.incoterm }}):</strong>
+          <strong style="font-size: 1.5rem; color: var(--primary-700); font-family: var(--font-heading);">
+            {{ quotation.currency }} {{ quotation.total_amount|floatformat:2 }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes & Terms -->
+    {% if quotation.sales_rep_notes %}
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+        <strong style="font-size: 0.85rem; color: #166534; text-transform: uppercase; display: block; margin-bottom: 0.35rem;">
+          Export Sales Desk Inclusions &amp; Operational Notes:
+        </strong>
+        <p style="margin: 0; font-size: 0.9rem; color: #15803d; white-space: pre-line; line-height: 1.5;">
+          {{ quotation.sales_rep_notes }}
+        </p>
+      </div>
+    {% endif %}
+
+    <!-- Existing Buyer Feedback if Negotiated -->
+    {% if quotation.buyer_feedback %}
+      <div style="background: #fefce8; border: 1px solid #fef08a; padding: 1.25rem; border-radius: var(--radius-sm);">
+        <strong style="font-size: 0.85rem; color: #854d0e; text-transform: uppercase; display: block; margin-bottom: 0.35rem;">
+          Buyer Feedback &amp; Revision Log:
+        </strong>
+        <p style="margin: 0; font-size: 0.9rem; color: #713f12; white-space: pre-line;">
+          {{ quotation.buyer_feedback }}
+        </p>
+      </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Interactive Buyer Action Panel (Only if SENT or NEGOTIATING) -->
+  <div class="no-print">
+    {% if quotation.status == 'SENT' or quotation.status == 'NEGOTIATING' %}
+      <div class="card" style="padding: 2.5rem; border-top: 4px solid var(--primary-600);">
+        <h3 style="font-size: 1.35rem; margin-bottom: 0.5rem; color: var(--slate-900);">
+          Buyer Commercial Response &amp; Order Decision
+        </h3>
+        <p style="color: var(--slate-600); margin-bottom: 1.5rem; font-size: 0.95rem;">
+          Please select your commercial action. Accepting will initiate the formal bilateral trade contract and lock shipment allocation. You can also request revisions or decline.
+        </p>
+
+        <form method="post">
+          {% csrf_token %}
+
+          <!-- Action Options -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+            
+            <label style="border: 2px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem; cursor: pointer; display: block; transition: all var(--transition-fast);" class="action-card" id="card-accept">
+              <input type="radio" name="action" value="accept" checked style="margin-right: 0.5rem;">
+              <strong style="color: var(--primary-700); font-size: 1.05rem;">Accept Quotation</strong>
+              <p style="margin: 0.5rem 0 0; font-size: 0.825rem; color: var(--slate-500);">
+                Confirm commercial pricing, payment terms, and lock production allocation.
+              </p>
+            </label>
+
+            <label style="border: 2px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem; cursor: pointer; display: block; transition: all var(--transition-fast);" class="action-card" id="card-negotiate">
+              <input type="radio" name="action" value="negotiate" style="margin-right: 0.5rem;">
+              <strong style="color: #b45309; font-size: 1.05rem;">Request Revision / Negotiate</strong>
+              <p style="margin: 0.5rem 0 0; font-size: 0.825rem; color: var(--slate-500);">
+                Submit counter-offer on price, Incoterm, payment milestones, or lead times.
+              </p>
+            </label>
+
+            <label style="border: 2px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.25rem; cursor: pointer; display: block; transition: all var(--transition-fast);" class="action-card" id="card-decline">
+              <input type="radio" name="action" value="decline" style="margin-right: 0.5rem;">
+              <strong style="color: #dc2626; font-size: 1.05rem;">Decline Quotation</strong>
+              <p style="margin: 0.5rem 0 0; font-size: 0.825rem; color: var(--slate-500);">
+                Close this enquiry if requirements have shifted or budget is unaligned.
+              </p>
+            </label>
+
+          </div>
+
+          <!-- Notes Textarea -->
+          <div style="margin-bottom: 1.5rem;">
+            <label for="feedback_notes" style="font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
+              Decision Remarks / Revision Notes (Optional for acceptance, recommended for revisions):
+            </label>
+            {{ form.feedback_notes }}
+          </div>
+
+          <!-- Submit Button -->
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <button type="submit" class="btn btn-primary" id="btn-submit-decision" style="padding: 0.75rem 2rem;">
+              Submit Official Decision &rarr;
+            </button>
+            <span style="font-size: 0.85rem; color: var(--slate-500);">
+              Your response will be immediately dispatched to your designated sales executive.
+            </span>
+          </div>
+
+        </form>
+      </div>
+    {% elif quotation.status == 'ACCEPTED' %}
+      <div class="card" style="padding: 2.5rem; text-align: center; border-top: 4px solid #16a34a; background: #f0fdf4;">
+        <div style="font-size: 3rem; color: #16a34a; margin-bottom: 0.75rem;">✓</div>
+        <h3 style="font-size: 1.5rem; color: #166534; margin-bottom: 0.5rem;">
+          Quotation Officially Accepted &bull; Deal Confirmed
+        </h3>
+        <p style="color: #15803d; max-width: 550px; margin: 0 auto 1.5rem; font-size: 0.95rem;">
+          Thank you for confirming quotation {{ quotation.quote_number }}. Our international trade desk is preparing your bilateral sales contract, Proforma Invoice, and factory allocation schedule.
+        </p>
+        <a href="{% url 'dashboard:buyer_enquiry_detail' enquiry.id %}" class="btn btn-primary">
+          View Live Order Tracker &rarr;
+        </a>
+      </div>
+    {% elif quotation.status == 'DECLINED' %}
+      <div class="card" style="padding: 2.5rem; text-align: center; border-top: 4px solid #dc2626; background: #fef2f2;">
+        <h3 style="font-size: 1.35rem; color: #991b1b; margin-bottom: 0.5rem;">
+          Quotation Closed / Declined
+        </h3>
+        <p style="color: #7f1d1d; margin: 0 auto 1.5rem;">
+          This quotation has been closed. You may submit a new project enquiry anytime should project specifications resume.
+        </p>
+        <a href="{% url 'enquiries:project' %}" class="btn btn-secondary">Submit New Enquiry</a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+
+<style>
+@media print {
+  .no-print { display: none !important; }
+  header, footer { display: none !important; }
+  body { background: white !important; }
+  .container { max-width: 100% !important; padding: 0 !important; }
+  .card { box-shadow: none !important; border: none !important; padding: 0 !important; }
+}
+</style>
+{% endblock %}

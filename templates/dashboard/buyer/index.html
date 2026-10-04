@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block title %}Buyer Dashboard — SolarLink Export Portal{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem;">
+          <span class="badge badge-primary">Buyer Portal &bull; International Workspace</span>
+          <span style="font-size: 0.85rem; color: var(--slate-500);">Enterprise Portal</span>
+        </div>
+        <h1 style="font-size: 2.25rem; margin-bottom: 0.25rem;">
+          Welcome back, {{ user.first_name|default:user.username }}
+        </h1>
+        <p style="margin: 0; color: var(--slate-600); font-size: 1rem;">
+          {{ profile.company_name|default:'International Renewable Energy Buyer' }} &bull; {{ profile.country|default:'Global Markets' }}
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="{% url 'enquiries:project' %}" class="btn btn-primary" id="buyer-new-rfq-btn">
+          + New Project Enquiry
+        </a>
+        <a href="{% url 'dashboard:saved_products' %}" class="btn btn-secondary">
+          Wishlist ({{ total_saved }})
+        </a>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-outline">
+          Edit Profile
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  <!-- 4 KPI Stat Metric Cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid var(--primary-600);">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Total Project RFQs</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: var(--slate-900); margin: 0.25rem 0;">
+        {{ total_enquiries }}
+      </div>
+      <a href="{% url 'dashboard:buyer_enquiries' %}" style="font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">View all enquiries &rarr;</a>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid var(--accent-sun-500);">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Active in Review</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: var(--accent-sun-600); margin: 0.25rem 0;">
+        {{ active_enquiries }}
+      </div>
+      <span style="font-size: 0.8rem; color: var(--slate-500);">Under sales engineering review</span>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid #0284c7;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Received Quotations</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: #0284c7; margin: 0.25rem 0;">
+        {{ total_quotations }}
+      </div>
+      <a href="{% url 'dashboard:buyer_quotations' %}" style="font-size: 0.8rem; font-weight: 600; color: #0284c7;">
+        {% if pending_quotes > 0 %}{{ pending_quotes }} pending response &rarr;{% else %}View quote history &rarr;{% endif %}
+      </a>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid #8b5cf6;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Saved Equipment</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: #8b5cf6; margin: 0.25rem 0;">
+        {{ total_saved }}
+      </div>
+      <a href="{% url 'dashboard:saved_products' %}" style="font-size: 0.8rem; font-weight: 600; color: #8b5cf6;">Open saved wishlist &rarr;</a>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 340px; gap: 2.5rem; align-items: start;">
+
+    <!-- Left Column: Recent Enquiries & Latest Quotations -->
+    <div>
+      <!-- Recent Enquiries Section -->
+      <div class="card" style="padding: 1.75rem; margin-bottom: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+          <h3 style="font-size: 1.25rem; margin: 0;">My Project Enquiries</h3>
+          <a href="{% url 'dashboard:buyer_enquiries' %}" class="btn btn-secondary btn-sm">View All ({{ total_enquiries }})</a>
+        </div>
+
+        {% if recent_enquiries %}
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Enquiry Ref</th>
+                  <th>Project Name</th>
+                  <th>Capacity</th>
+                  <th>Destination Port</th>
+                  <th>Current Milestone</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for enq in recent_enquiries %}
+                  <tr>
+                    <td style="font-family: var(--font-mono); font-weight: 700; color: var(--primary-700);">
+                      {{ enq.enquiry_number }}
+                    </td>
+                    <td style="font-weight: 600; color: var(--slate-900);">
+                      {{ enq.project_name }}
+                    </td>
+                    <td>{{ enq.required_capacity }}</td>
+                    <td style="color: var(--slate-600);">{{ enq.shipping_destination }}</td>
+                    <td>
+                      <span class="status-badge {% if enq.status == 'QUOTATION_SENT' or enq.status == 'APPROVED' %}status-won{% elif enq.status == 'UNDER_REVIEW' or enq.status == 'QUOTATION_PREPARED' %}status-under_review{% else %}status-assigned{% endif %}" style="font-size: 0.75rem;">
+                        <span class="status-dot"></span> {{ enq.get_status_display }}
+                      </span>
+                    </td>
+                    <td>
+                      <a href="{% url 'dashboard:buyer_enquiry_detail' enq.id %}" class="btn btn-outline btn-sm" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">
+                        Tracker &rarr;
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div style="padding: 2.5rem; text-align: center; color: var(--slate-500);">
+            <p>You haven't submitted any project enquiries yet.</p>
+            <a href="{% url 'enquiries:project' %}" class="btn btn-primary btn-sm">Submit First Project RFQ</a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Latest Commercial Quotations Section -->
+      <div class="card" style="padding: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+          <h3 style="font-size: 1.25rem; margin: 0;">Received Formal Quotations</h3>
+          <a href="{% url 'dashboard:buyer_quotations' %}" class="btn btn-secondary btn-sm">All Quotes ({{ total_quotations }})</a>
+        </div>
+
+        {% if latest_quotations %}
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for quote in latest_quotations %}
+              <div style="padding: 1.25rem; background: var(--slate-50); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                  <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.25rem;">
+                    <span style="font-family: var(--font-mono); font-weight: 800; color: var(--slate-900); font-size: 1.05rem;">
+                      {{ quote.quote_number }}
+                    </span>
+                    <span class="badge {% if quote.status == 'ACCEPTED' %}badge-success{% elif quote.status == 'SENT' %}badge-primary{% elif quote.status == 'NEGOTIATING' %}badge-warning{% else %}badge-neutral{% endif %}">
+                      {{ quote.get_status_display }}
+                    </span>
+                  </div>
+                  <div style="font-size: 0.85rem; color: var(--slate-600);">
+                    Project: <strong>{{ quote.enquiry.project_name }}</strong> &bull; Valid until: {{ quote.valid_until|date:"d M Y" }}
+                  </div>
+                  <div style="font-size: 0.825rem; color: var(--slate-500); margin-top: 0.2rem;">
+                    Incoterm: <strong>{{ quote.incoterm }}</strong> &bull; Issued by: {{ quote.sales_rep.get_full_name|default:quote.sales_rep.username }}
+                  </div>
+                </div>
+
+                <div style="text-align: right;">
+                  <div style="font-size: 1.4rem; font-weight: 800; font-family: var(--font-heading); color: var(--primary-700);">
+                    {{ quote.currency }} {{ quote.total_amount|floatformat:2 }}
+                  </div>
+                  <a href="{% url 'dashboard:buyer_quotation_detail' quote.id %}" class="btn btn-primary btn-sm" style="margin-top: 0.4rem;">
+                    Review & Respond &rarr;
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="padding: 2.5rem; text-align: center; color: var(--slate-500);">
+            <p>No formal quotations have been issued for your account yet.</p>
+            <p style="font-size: 0.85rem;">Once our sales desk reviews your enquiries, itemized quotations will appear here.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right Column: Wishlist Preview & Duty Desk -->
+    <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+      
+      <!-- Wishlist Preview -->
+      <div class="card" style="padding: 1.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
+          <h4 style="margin: 0; font-size: 1.1rem;">Saved Products</h4>
+          <a href="{% url 'dashboard:saved_products' %}" style="font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">View All</a>
+        </div>
+
+        {% if saved_products_preview %}
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+            {% for item in saved_products_preview %}
+              <div style="padding: 0.75rem; background: var(--slate-50); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 0.72rem; color: var(--primary-700); font-weight: 700; text-transform: uppercase;">{{ item.product.brand }}</div>
+                <div style="font-weight: 600; font-size: 0.9rem; margin: 0.15rem 0;">
+                  <a href="{% url 'catalog:detail' item.product.slug %}" style="color: var(--slate-900);">{{ item.product.name|truncatewords:6 }}</a>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.4rem;">
+                  <span style="font-size: 0.8rem; font-weight: 700; color: var(--slate-700);">{{ item.product.display_power }}</span>
+                  <a href="{% url 'enquiries:project' %}?product={{ item.product.id }}" class="btn btn-outline btn-sm" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">
+                    RFQ &rarr;
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="text-align: center; color: var(--slate-500); padding: 1.5rem 0; font-size: 0.875rem;">
+            Your wishlist is empty. Browse the catalog to save tier-1 equipment!
+            <div style="margin-top: 0.75rem;">
+              <a href="{% url 'catalog:list' %}" class="btn btn-secondary btn-sm">Browse Catalog</a>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Trade Desk Contact -->
+      <div class="card" style="padding: 1.5rem; background: linear-gradient(135deg, var(--slate-900), var(--slate-800)); color: #ffffff;">
+        <span class="badge badge-sun" style="margin-bottom: 0.75rem;">Direct Export Desk</span>
+        <h4 style="color: #ffffff; margin-bottom: 0.5rem;">Need Urgent Allocation?</h4>
+        <p style="font-size: 0.85rem; color: var(--slate-300); line-height: 1.5; margin-bottom: 1.25rem;">
+          Connect directly with duty export logistics managers for container spot rates and warehouse clearance.
+        </p>
+        <a href="https://wa.me/493055441122" target="_blank" class="btn btn-accent btn-block btn-sm">
+          WhatsApp Priority Desk &rarr;
+        </a>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

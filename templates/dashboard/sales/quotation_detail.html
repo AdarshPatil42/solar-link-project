@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %}Quotation {{ quotation.quote_number }} — SolarLink Sales{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 2.5rem 0 1.5rem;" class="no-print">
+  <div class="container">
+    <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.5rem;">
+      <a href="{% url 'sales:dashboard' %}">Sales Workspace</a>
+      <span>/</span>
+      <a href="{% url 'sales:quotations' %}">Quotations</a>
+      <span>/</span>
+      <span style="color: var(--slate-800); font-weight: 600;">{{ quotation.quote_number }}</span>
+    </nav>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2.25rem; margin: 0;">Quotation {{ quotation.quote_number }}</h1>
+        <p style="margin: 0.25rem 0 0; color: var(--slate-600);">
+          Issued to <strong>{{ enquiry.company_name|default:enquiry.full_name }}</strong> &bull; Lead Ref: <strong>{{ enquiry.enquiry_number }}</strong>
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <button onclick="window.print()" class="btn btn-secondary">
+          🖨️ Print Proforma
+        </button>
+        <a href="{% url 'sales:create_quote' enquiry.id %}" class="btn btn-primary">
+          + Issue Revised Quote
+        </a>
+        <a href="{% url 'sales:enquiry_detail' enquiry.id %}" class="btn btn-outline">
+          &larr; Back to Lead
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  <!-- Proforma Invoice Presentation Card -->
+  <div class="card" style="padding: 3rem; margin-bottom: 2.5rem; background: #ffffff;" id="printable-quote">
+    
+    <!-- Top Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--primary-600); padding-bottom: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;">
+      <div>
+        <div style="font-size: 1.6rem; font-weight: 800; font-family: var(--font-heading); color: var(--primary-700);">
+          SOLAR<span style="color: var(--accent-sun-500);">LINK</span> EXPORTS
+        </div>
+        <div style="font-size: 0.85rem; color: var(--slate-500); margin-top: 0.25rem;">
+          Commercial Proforma Quotation &bull; Export Trade Desk<br>
+          Account Executive: {{ quotation.sales_rep.get_full_name|default:quotation.sales_rep.username }} ({{ quotation.sales_rep.email }})
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <div style="font-size: 1.5rem; font-weight: 800; color: var(--slate-900); font-family: monospace;">
+          {{ quotation.quote_number }}
+        </div>
+        <div style="font-size: 0.85rem; color: var(--slate-600); margin-top: 0.25rem;">
+          Issue Date: <strong>{{ quotation.created_at|date:"d M Y" }}</strong><br>
+          Validity: <strong style="color: var(--color-danger);">{{ quotation.valid_until|date:"d M Y" }}</strong>
+        </div>
+        <div style="margin-top: 0.5rem;">
+          {% if quotation.status == 'SENT' %}
+            <span class="badge badge-primary" style="background: #0284c7; color: white;">Sent &bull; Awaiting Buyer Decision</span>
+          {% elif quotation.status == 'ACCEPTED' %}
+            <span class="badge badge-success" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">✓ Accepted &amp; Confirmed</span>
+          {% elif quotation.status == 'NEGOTIATING' %}
+            <span class="badge badge-warning" style="font-size: 0.9rem; padding: 0.4rem 0.8rem;">Buyer Counter-Offer / In Negotiation</span>
+          {% elif quotation.status == 'DECLINED' %}
+            <span class="badge badge-danger">Declined by Buyer</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Parties Grid -->
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 2rem; background: var(--slate-50); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+      <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase; margin-bottom: 0.4rem;">Consignee / Client</div>
+        <div style="font-weight: 700; font-size: 1.1rem; color: var(--slate-900);">{{ enquiry.company_name|default:enquiry.full_name }}</div>
+        <div style="font-size: 0.85rem; color: var(--slate-600); margin-top: 0.25rem; line-height: 1.6;">
+          Attn: {{ enquiry.full_name }}<br>
+          Email: {{ enquiry.email }}<br>
+          Destination: <strong>{{ enquiry.shipping_destination|default:enquiry.country }}</strong>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase; margin-bottom: 0.4rem;">Trade &amp; Logistics Framework</div>
+        <div style="font-size: 0.85rem; color: var(--slate-600); line-height: 1.6;">
+          Incoterms: <strong style="color: var(--primary-700); font-size: 1rem;">{{ quotation.incoterm }}</strong><br>
+          Payment Terms: <strong>{{ quotation.payment_terms }}</strong><br>
+          Project: <strong>{{ enquiry.project_name }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Line Items Table -->
+    <div class="table-responsive" style="margin-bottom: 2rem;">
+      <table class="table" style="margin: 0;">
+        <thead style="background: var(--slate-100);">
+          <tr>
+            <th style="width: 5%;">#</th>
+            <th style="width: 50%;">Product Specification / Scope</th>
+            <th style="width: 15%; text-align: center;">Qty</th>
+            <th style="width: 15%; text-align: right;">Unit Price ({{ quotation.currency }})</th>
+            <th style="width: 15%; text-align: right;">Total Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in quotation.items.all %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>
+                <div style="font-weight: 700; color: var(--slate-900);">{{ item.product.name }}</div>
+                <div style="font-size: 0.8rem; color: var(--slate-500);">
+                  {{ item.product.brand }} &bull; SKU: {{ item.product.product_code }} &bull; {{ item.specifications_summary }}
+                </div>
+              </td>
+              <td style="text-align: center; font-weight: 600;">{{ item.quantity }} units</td>
+              <td style="text-align: right; font-family: monospace;">${{ item.unit_price|floatformat:2 }}</td>
+              <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--slate-900);">
+                ${{ item.total_price|floatformat:2 }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td>1</td>
+              <td>
+                <div style="font-weight: 700; color: var(--slate-900);">Commercial Turnkey Scope — {{ enquiry.project_name }}</div>
+                <div style="font-size: 0.8rem; color: var(--slate-500);">Complete solar equipment procurement scope as specified in RFQ {{ enquiry.enquiry_number }}</div>
+              </td>
+              <td style="text-align: center; font-weight: 600;">1 lot</td>
+              <td style="text-align: right; font-family: monospace;">${{ quotation.total_amount|floatformat:2 }}</td>
+              <td style="text-align: right; font-family: monospace; font-weight: 700; color: var(--slate-900);">${{ quotation.total_amount|floatformat:2 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Total Breakdown -->
+    <div style="display: flex; justify-content: flex-end; margin-bottom: 2rem;">
+      <div style="width: 360px; background: var(--slate-50); padding: 1.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.9rem;">
+          <span style="color: var(--slate-600);">Quotation Base Value:</span>
+          <span style="font-weight: 600;">{{ quotation.currency }} {{ quotation.total_amount|floatformat:2 }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-size: 0.9rem;">
+          <span style="color: var(--slate-600);">Logistics Standard:</span>
+          <span style="font-weight: 600; color: var(--primary-700);">Included ({{ quotation.incoterm }})</span>
+        </div>
+        <div style="border-top: 2px solid var(--slate-300); padding-top: 0.75rem; display: flex; justify-content: space-between; align-items: baseline;">
+          <strong style="font-size: 1.1rem; color: var(--slate-900);">Total Value:</strong>
+          <strong style="font-size: 1.5rem; color: var(--primary-700); font-family: var(--font-heading);">
+            {{ quotation.currency }} {{ quotation.total_amount|floatformat:2 }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes & Terms -->
+    {% if quotation.sales_rep_notes %}
+      <div style="background: #f0fdf4; border: 1px solid #bbf7d0; padding: 1.25rem; border-radius: var(--radius-sm); margin-bottom: 1.5rem;">
+        <strong style="font-size: 0.85rem; color: #166534; text-transform: uppercase; display: block; margin-bottom: 0.35rem;">
+          Quotation Notes &amp; Commercial Clauses:
+        </strong>
+        <p style="margin: 0; font-size: 0.9rem; color: #15803d; white-space: pre-line;">
+          {{ quotation.sales_rep_notes }}
+        </p>
+      </div>
+    {% endif %}
+
+    <!-- Buyer Feedback if any -->
+    {% if quotation.buyer_feedback %}
+      <div style="background: #fefce8; border: 1px solid #fef08a; padding: 1.25rem; border-radius: var(--radius-sm);">
+        <strong style="font-size: 0.85rem; color: #854d0e; text-transform: uppercase; display: block; margin-bottom: 0.35rem;">
+          Buyer Commercial Response:
+        </strong>
+        <p style="margin: 0; font-size: 0.95rem; color: #713f12; white-space: pre-line; font-weight: 500;">
+          {{ quotation.buyer_feedback }}
+        </p>
+      </div>
+    {% endif %}
+
+  </div>
+
+</div>
+
+<style>
+@media print {
+  .no-print { display: none !important; }
+  header, footer { display: none !important; }
+  body { background: white !important; }
+  .container { max-width: 100% !important; padding: 0 !important; }
+  .card { box-shadow: none !important; border: none !important; padding: 0 !important; }
+}
+</style>
+{% endblock %}

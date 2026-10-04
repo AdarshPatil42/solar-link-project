@@ -11,6 +11,7 @@ urlpatterns = [
     path('certifications/', include('certifications.urls')),
     path('export-info/', include('exports.urls')),
     path('dashboard/', include('dashboard.urls')),
+    path('sales/', include('dashboard.sales_urls')),
     path('', include('pages.urls')),
 ]
 

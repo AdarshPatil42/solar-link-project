@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+
+{% block title %}Quotation Builder — Enquiry {{ enquiry.enquiry_number }} — SolarLink Sales{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.5rem;">
+      <a href="{% url 'sales:dashboard' %}">Sales Workspace</a>
+      <span>/</span>
+      <a href="{% url 'sales:enquiries' %}">Leads Queue</a>
+      <span>/</span>
+      <a href="{% url 'sales:enquiry_detail' enquiry.id %}">{{ enquiry.enquiry_number }}</a>
+      <span>/</span>
+      <span style="color: var(--slate-800); font-weight: 600;">Build Quotation</span>
+    </nav>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h1 style="font-size: 2.25rem; margin: 0;">Commercial Quotation Builder</h1>
+        <p style="margin: 0.25rem 0 0; color: var(--slate-600); font-size: 0.95rem;">
+          Generating formal proforma pricing for <strong>{{ enquiry.company_name|default:enquiry.full_name }}</strong> &bull; Destination: <strong>{{ enquiry.shipping_destination|default:enquiry.country }}</strong>
+        </p>
+      </div>
+
+      <a href="{% url 'sales:enquiry_detail' enquiry.id %}" class="btn btn-outline">
+        &larr; Cancel &amp; Back to Lead
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  <div style="display: grid; grid-template-columns: 1fr 360px; gap: 2.5rem; align-items: start;">
+
+    <!-- Left Column: Form & Equipment Preview -->
+    <div>
+      
+      <!-- Equipment Items Preview -->
+      <div class="card" style="padding: 1.75rem; margin-bottom: 2rem;">
+        <h3 style="font-size: 1.2rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.5rem;">
+          Equipment BOM Requested by Buyer
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--slate-500); margin-bottom: 1rem;">
+          These items will be packaged into the official commercial quotation. Line-item unit prices are calculated based on your total quoted value.
+        </p>
+
+        {% if enquiry.items.all %}
+          <div class="table-responsive">
+            <table class="table" style="margin: 0;">
+              <thead>
+                <tr>
+                  <th>Product Specification</th>
+                  <th>Quantity</th>
+                  <th>Target Price</th>
+                  <th>Buyer Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in enquiry.items.all %}
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600; color: var(--slate-900);">{{ item.product.name }}</div>
+                      <div style="font-size: 0.75rem; color: var(--slate-500);">
+                        {{ item.product.brand }} &bull; SKU: {{ item.product.product_code }}
+                      </div>
+                    </td>
+                    <td>
+                      <strong>{{ item.quantity }} units</strong>
+                    </td>
+                    <td>
+                      {% if item.target_price_usd %}
+                        ${{ item.target_price_usd|floatformat:2 }} USD
+                      {% else %}
+                        <span style="color: var(--slate-400);">Open Quote</span>
+                      {% endif %}
+                    </td>
+                    <td style="font-size: 0.825rem; color: var(--slate-600);">
+                      {{ item.notes|default:'Standard datasheet specs' }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p style="color: var(--slate-500); margin: 0;">Turnkey / Custom scope enquiry.</p>
+        {% endif %}
+      </div>
+
+      <!-- Quotation Form Card -->
+      <div class="card" style="padding: 2.25rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+          Commercial Parameters &amp; Pricing Structure
+        </h3>
+
+        <form method="post" id="quote-builder-form">
+          {% csrf_token %}
+
+          <!-- Row 1: Amount & Currency -->
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+            <div>
+              <label for="id_total_amount" style="font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 0.4rem;">
+                Total Quoted Commercial Value *
+              </label>
+              {{ form.total_amount }}
+              {% if form.total_amount.errors %}
+                <div style="color: var(--color-danger); font-size: 0.8rem; margin-top: 0.25rem;">{{ form.total_amount.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div>
+              <label for="id_currency" style="font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 0.4rem;">
+                Currency *
+              </label>
+              {{ form.currency }}
+              {% if form.currency.errors %}
+                <div style="color: var(--color-danger); font-size: 0.8rem; margin-top: 0.25rem;">{{ form.currency.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Row 2: Incoterm & Validity -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 1.5rem;">
+            <div>
+              <label for="id_incoterm" style="font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 0.4rem;">
+                Incoterms 2020 Standard *
+              </label>
+              {{ form.incoterm }}
+              {% if form.incoterm.errors %}
+                <div style="color: var(--color-danger); font-size: 0.8rem; margin-top: 0.25rem;">{{ form.incoterm.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div>
+              <label for="id_valid_until" style="font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 0.4rem;">
+                Quotation Validity Expiry Date *
+              </label>
+              {{ form.valid_until }}
+              {% if form.valid_until.errors %}
+                <div style="color: var(--color-danger); font-size: 0.8rem; margin-top: 0.25rem;">{{ form.valid_until.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Row 3: Payment Terms -->
+          <div style="margin-bottom: 1.5rem;">
+            <label for="id_payment_terms" style="font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 0.4rem;">
+              Payment Milestones &amp; Credit Terms *
+            </label>
+            {{ form.payment_terms }}
+            {% if form.payment_terms.errors %}
+              <div style="color: var(--color-danger); font-size: 0.8rem; margin-top: 0.25rem;">{{ form.payment_terms.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Row 4: Sales Rep Notes -->
+          <div style="margin-bottom: 2rem;">
+            <label for="id_sales_rep_notes" style="font-weight: 600; font-size: 0.875rem; display: block; margin-bottom: 0.4rem;">
+              Commercial Notes, Packaging &amp; Warranty Inclusions
+            </label>
+            {{ form.sales_rep_notes }}
+            {% if form.sales_rep_notes.errors %}
+              <div style="color: var(--color-danger); font-size: 0.8rem; margin-top: 0.25rem;">{{ form.sales_rep_notes.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div style="display: flex; gap: 1rem; align-items: center; border-top: 1px solid var(--border-subtle); padding-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" id="btn-issue-quote" style="padding: 0.75rem 2rem;">
+              Generate Official Quotation &amp; Dispatch to Buyer &rarr;
+            </button>
+            <span style="font-size: 0.85rem; color: var(--slate-500);">
+              Enquiry milestone will automatically progress to <strong>Quotation Delivered</strong>.
+            </span>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+
+    <!-- Right Sidebar: Pricing Guidelines & Incoterms reference -->
+    <div>
+      
+      <!-- Lead Summary Card -->
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h4 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--slate-800);">Enquiry Details</h4>
+        <div style="font-size: 0.85rem; line-height: 1.8; color: var(--slate-600);">
+          <div><strong>Enquiry Ref:</strong> {{ enquiry.enquiry_number }}</div>
+          <div><strong>Buyer:</strong> {{ enquiry.company_name|default:enquiry.full_name }}</div>
+          <div><strong>Country:</strong> {{ enquiry.country }}</div>
+          <div><strong>Discharge Port:</strong> {{ enquiry.shipping_destination|default:enquiry.country }}</div>
+          <div><strong>Capacity:</strong> {{ enquiry.estimated_capacity|default:'Turnkey' }}</div>
+          <div><strong>Target Date:</strong> {{ enquiry.target_delivery_date|date:"d M Y"|default:'Flexible' }}</div>
+        </div>
+      </div>
+
+      <!-- Trade Terms Reference -->
+      <div class="card" style="padding: 1.5rem; background: var(--slate-50); border: 1px solid var(--border-subtle);">
+        <h4 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--slate-800);">Incoterms 2020 Cheat Sheet</h4>
+        <div style="font-size: 0.825rem; color: var(--slate-600); line-height: 1.6; display: flex; flex-direction: column; gap: 0.75rem;">
+          <div>
+            <strong style="color: var(--primary-700);">CIF (Cost, Insurance &amp; Freight):</strong>
+            <div>Seller covers freight and marine cargo insurance to buyer's destination port. Buyer handles local customs.</div>
+          </div>
+          <div>
+            <strong style="color: var(--primary-700);">FOB (Free On Board):</strong>
+            <div>Seller delivers onto ship at loading port. Buyer arranges ocean freight, marine insurance, and customs.</div>
+          </div>
+          <div>
+            <strong style="color: var(--primary-700);">DDP (Delivered Duty Paid):</strong>
+            <div>Seller handles all costs including door delivery and import tariffs at destination.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

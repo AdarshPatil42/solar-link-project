@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}My Project Enquiries — SolarLink{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.5rem;">
+          <a href="{% url 'dashboard:buyer_dashboard' %}">Dashboard</a>
+          <span>/</span>
+          <span style="color: var(--slate-800); font-weight: 600;">Project Enquiries</span>
+        </nav>
+        <h1 style="font-size: 2.25rem; margin: 0;">My Project Enquiries &amp; RFQs</h1>
+      </div>
+      <a href="{% url 'enquiries:project' %}" class="btn btn-primary" id="btn-create-rfq-list">
+        + Submit New Project RFQ
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  <!-- Search & Filter Controls -->
+  <div class="card" style="padding: 1.25rem 1.5rem; margin-bottom: 2rem;">
+    <form method="get" style="display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+      <div style="flex: 1; min-width: 240px;">
+        <input type="text" name="q" value="{{ q }}" placeholder="Search by enquiry #, project name, or destination..." class="form-control" style="width: 100%;">
+      </div>
+      
+      <div style="width: 220px;">
+        <select name="status" class="form-select" style="width: 100%;" onchange="this.form.submit()">
+          <option value="">All Milestone Statuses</option>
+          {% for code, label in status_choices %}
+            <option value="{{ code }}" {% if selected_status == code %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem;">
+        <button type="submit" class="btn btn-secondary">Filter</button>
+        {% if q or selected_status %}
+          <a href="{% url 'dashboard:buyer_enquiries' %}" class="btn btn-outline" title="Reset Filters">Reset</a>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Enquiries Table -->
+  {% if enquiries %}
+    <div class="card" style="padding: 0; overflow: hidden;">
+      <div class="table-responsive">
+        <table class="table" style="margin: 0;">
+          <thead>
+            <tr>
+              <th>Enquiry Ref</th>
+              <th>Project Name</th>
+              <th>Type / Capacity</th>
+              <th>Destination</th>
+              <th>Preferred Terms</th>
+              <th>Current Stage</th>
+              <th>Submitted</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for enq in enquiries %}
+              <tr>
+                <td>
+                  <strong style="color: var(--primary-700); font-family: monospace; font-size: 0.95rem;">
+                    {{ enq.enquiry_number }}
+                  </strong>
+                </td>
+                <td>
+                  <div style="font-weight: 600; color: var(--slate-900);">{{ enq.project_name }}</div>
+                  <div style="font-size: 0.75rem; color: var(--slate-500);">
+                    {{ enq.items.count }} item{{ enq.items.count|pluralize }} requested
+                  </div>
+                </td>
+                <td>
+                  <div>{{ enq.get_application_type_display|default:'Renewable Energy' }}</div>
+                  <div style="font-size: 0.8rem; font-weight: 600; color: var(--slate-600);">
+                    {{ enq.estimated_capacity|default:'Custom Scope' }}
+                  </div>
+                </td>
+                <td>
+                  <div>{{ enq.shipping_destination|default:'Global Port' }}</div>
+                  <div style="font-size: 0.75rem; color: var(--slate-500);">{{ enq.country }}</div>
+                </td>
+                <td>
+                  <span class="badge badge-secondary">{{ enq.preferred_incoterm|default:'CIF' }}</span>
+                </td>
+                <td>
+                  {% if enq.status == 'REQUESTED' %}
+                    <span class="badge badge-secondary">New / Received</span>
+                  {% elif enq.status == 'ASSIGNED' %}
+                    <span class="badge badge-primary">Assigned to Engineer</span>
+                  {% elif enq.status == 'UNDER_REVIEW' %}
+                    <span class="badge badge-warning">Technical Review</span>
+                  {% elif enq.status == 'QUOTATION_PREPARED' %}
+                    <span class="badge badge-warning">Quotation Prepared</span>
+                  {% elif enq.status == 'QUOTATION_SENT' %}
+                    <span class="badge badge-primary" style="background: #0284c7; color: white;">Quotation Delivered</span>
+                  {% elif enq.status == 'NEGOTIATION' %}
+                    <span class="badge badge-warning" style="background: #eab308; color: #713f12;">Commercial Negotiation</span>
+                  {% elif enq.status == 'APPROVED' %}
+                    <span class="badge badge-success">Deal Won &amp; Confirmed</span>
+                  {% elif enq.status == 'REJECTED' %}
+                    <span class="badge badge-danger">Declined</span>
+                  {% else %}
+                    <span class="badge badge-secondary">{{ enq.get_status_display }}</span>
+                  {% endif %}
+                </td>
+                <td style="font-size: 0.85rem; color: var(--slate-500);">
+                  {{ enq.created_at|date:"d M Y" }}
+                </td>
+                <td style="text-align: right;">
+                  <a href="{% url 'dashboard:buyer_enquiry_detail' enq.id %}" class="btn btn-secondary btn-sm">
+                    View Details &rarr;
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% else %}
+    <div class="card" style="padding: 4rem 2rem; text-align: center;">
+      <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+      <h3 style="margin-bottom: 0.5rem;">No project enquiries found</h3>
+      <p style="color: var(--slate-500); max-width: 460px; margin: 0 auto 1.5rem;">
+        {% if q or selected_status %}
+          No enquiries matched your filter criteria. Try clearing your search query or status filter.
+        {% else %}
+          You haven't submitted any commercial project enquiries yet. Submit your technical equipment specs to receive international FOB/CIF pricing.
+        {% endif %}
+      </p>
+      {% if q or selected_status %}
+        <a href="{% url 'dashboard:buyer_enquiries' %}" class="btn btn-secondary">Clear Filters</a>
+      {% else %}
+        <a href="{% url 'enquiries:project' %}" class="btn btn-primary">Submit First Project RFQ</a>
+      {% endif %}
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

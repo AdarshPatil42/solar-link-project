@@ -1,0 +1,271 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales Executive Command Center — SolarLink{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem;">
+          <span class="badge badge-warning" style="background: #fef3c7; color: #92400e; border: 1px solid #fde68a;">
+            Sales Workspace &bull; Executive Portal
+          </span>
+          <span style="font-size: 0.85rem; color: var(--slate-500);">International Trade Desk</span>
+        </div>
+        <h1 style="font-size: 2.25rem; margin-bottom: 0.25rem;">
+          Sales Command Center &bull; {{ user.get_full_name|default:user.username }}
+        </h1>
+        <p style="margin: 0; color: var(--slate-600); font-size: 1rem;">
+          Region: <strong>{{ profile.country|default:'Global Markets' }}</strong> &bull; SolarLink Commercial &amp; Project Engineering Desk
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="{% url 'sales:pipeline' %}" class="btn btn-primary" id="btn-sales-pipeline">
+          Deal Pipeline (Kanban) &rarr;
+        </a>
+        <a href="{% url 'sales:enquiries' %}" class="btn btn-secondary">
+          Assigned Leads ({{ total_leads }})
+        </a>
+        <a href="{% url 'sales:quotations' %}" class="btn btn-outline">
+          All Quotations
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  <!-- 5 Sales KPI Cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 3rem;">
+    
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid var(--slate-600);">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Total Leads Assigned</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: var(--slate-900); margin: 0.25rem 0;">
+        {{ total_leads }}
+      </div>
+      <a href="{% url 'sales:enquiries' %}" style="font-size: 0.8rem; font-weight: 600; color: var(--slate-700);">View lead list &rarr;</a>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid #ef4444;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Pending Engineering Review</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: #ef4444; margin: 0.25rem 0;">
+        {{ pending_review }}
+      </div>
+      <span style="font-size: 0.8rem; color: var(--slate-500);">Requires technical triage</span>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid #0284c7;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Quotes Prepared / Sent</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: #0284c7; margin: 0.25rem 0;">
+        {{ quotes_prepared }}
+      </div>
+      <a href="{% url 'sales:quotations' %}" style="font-size: 0.8rem; font-weight: 600; color: #0284c7;">Review sent quotes &rarr;</a>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid #eab308;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">In Active Negotiation</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: #ca8a04; margin: 0.25rem 0;">
+        {{ negotiations }}
+      </div>
+      <span style="font-size: 0.8rem; color: var(--slate-500);">Counter-offers pending</span>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid #16a34a;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Won Deals &bull; Conversion</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: #16a34a; margin: 0.25rem 0;">
+        {{ won_deals }} <span style="font-size: 1rem; color: var(--slate-500); font-weight: 600;">({{ conversion_rate }})</span>
+      </div>
+      <span style="font-size: 0.8rem; color: var(--slate-500);">Confirmed order value</span>
+    </div>
+
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 360px; gap: 2.5rem; align-items: start;">
+
+    <!-- Left Main Column: Urgent Leads & Quotes -->
+    <div>
+      <!-- Urgent Leads Section -->
+      <div class="card" style="padding: 1.75rem; margin-bottom: 2.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+          <div>
+            <h3 style="font-size: 1.25rem; margin: 0;">Urgent Incoming Leads</h3>
+            <span style="font-size: 0.8rem; color: var(--slate-500);">Pending review or quotation generation</span>
+          </div>
+          <a href="{% url 'sales:enquiries' %}" class="btn btn-secondary btn-sm">All Leads &rarr;</a>
+        </div>
+
+        {% if urgent_leads %}
+          <div class="table-responsive">
+            <table class="table" style="margin: 0;">
+              <thead>
+                <tr>
+                  <th>Enquiry Ref</th>
+                  <th>Client / Company</th>
+                  <th>Project Scope</th>
+                  <th>Destination</th>
+                  <th>Current Stage</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for lead in urgent_leads %}
+                  <tr>
+                    <td>
+                      <strong style="color: var(--primary-700); font-family: monospace;">{{ lead.enquiry_number }}</strong>
+                      <div style="font-size: 0.75rem; color: var(--slate-400);">{{ lead.created_at|date:"d M Y" }}</div>
+                    </td>
+                    <td>
+                      <div style="font-weight: 600; color: var(--slate-900);">{{ lead.company_name|default:lead.full_name }}</div>
+                      <div style="font-size: 0.75rem; color: var(--slate-500);">{{ lead.country }}</div>
+                    </td>
+                    <td>
+                      <div style="font-size: 0.85rem; font-weight: 600;">{{ lead.project_name }}</div>
+                      <div style="font-size: 0.75rem; color: var(--slate-500);">{{ lead.estimated_capacity|default:'Scope unspecified' }}</div>
+                    </td>
+                    <td>
+                      <span class="badge badge-secondary">{{ lead.shipping_destination|default:lead.country }}</span>
+                    </td>
+                    <td>
+                      {% if lead.status == 'REQUESTED' %}
+                        <span class="badge badge-secondary">New / Unreviewed</span>
+                      {% elif lead.status == 'ASSIGNED' %}
+                        <span class="badge badge-primary">Assigned</span>
+                      {% elif lead.status == 'UNDER_REVIEW' %}
+                        <span class="badge badge-warning">Under Review</span>
+                      {% else %}
+                        <span class="badge badge-secondary">{{ lead.get_status_display }}</span>
+                      {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                      <a href="{% url 'sales:enquiry_detail' lead.id %}" class="btn btn-primary btn-sm">
+                        Manage Lead &rarr;
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div style="padding: 2.5rem; text-align: center; color: var(--slate-500);">
+            ✓ All incoming leads have been reviewed and advanced through pipeline stages!
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Recent Quotations Generated -->
+      <div class="card" style="padding: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+          <h3 style="font-size: 1.25rem; margin: 0;">Recent Quotations Issued</h3>
+          <a href="{% url 'sales:quotations' %}" class="btn btn-secondary btn-sm">All Quotes &rarr;</a>
+        </div>
+
+        {% if recent_quotes %}
+          <div class="table-responsive">
+            <table class="table" style="margin: 0;">
+              <thead>
+                <tr>
+                  <th>Quote Ref</th>
+                  <th>Client / Project</th>
+                  <th>Value</th>
+                  <th>Incoterm</th>
+                  <th>Buyer Decision</th>
+                  <th style="text-align: right;">View</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for q in recent_quotes %}
+                  <tr>
+                    <td>
+                      <strong style="color: var(--primary-700); font-family: monospace;">{{ q.quote_number }}</strong>
+                      <div style="font-size: 0.75rem; color: var(--slate-400);">{{ q.created_at|date:"d M Y" }}</div>
+                    </td>
+                    <td>
+                      <div style="font-weight: 600; color: var(--slate-900);">{{ q.enquiry.project_name }}</div>
+                      <div style="font-size: 0.75rem; color: var(--slate-500);">{{ q.enquiry.company_name|default:q.enquiry.full_name }}</div>
+                    </td>
+                    <td>
+                      <strong style="font-size: 1rem; color: var(--slate-900);">
+                        {{ q.currency }} {{ q.total_amount|floatformat:2 }}
+                      </strong>
+                    </td>
+                    <td><span class="badge badge-secondary">{{ q.incoterm }}</span></td>
+                    <td>
+                      {% if q.status == 'SENT' %}
+                        <span class="badge badge-primary" style="background: #0284c7; color: white;">Sent &bull; Pending</span>
+                      {% elif q.status == 'ACCEPTED' %}
+                        <span class="badge badge-success">Won / Accepted</span>
+                      {% elif q.status == 'NEGOTIATING' %}
+                        <span class="badge badge-warning" style="background: #eab308; color: #713f12;">Negotiating</span>
+                      {% elif q.status == 'DECLINED' %}
+                        <span class="badge badge-danger">Declined</span>
+                      {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                      <a href="{% url 'sales:quotation_detail' q.id %}" class="btn btn-secondary btn-sm">
+                        View &rarr;
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div style="padding: 2.5rem; text-align: center; color: var(--slate-500);">
+            No quotations issued yet. Select an assigned lead to build and dispatch an official quotation.
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Right Sidebar: Quick Actions & Pipeline Shortcut -->
+    <div>
+      
+      <!-- Quick Navigation Card -->
+      <div class="card" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h4 style="font-size: 1rem; margin-bottom: 1rem; color: var(--slate-800);">Commercial Actions</h4>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <a href="{% url 'sales:pipeline' %}" class="btn btn-primary" style="justify-content: flex-start;">
+            📊 Open Deal Kanban Pipeline
+          </a>
+          <a href="{% url 'sales:enquiries' %}" class="btn btn-secondary" style="justify-content: flex-start;">
+            📥 View Lead Queue
+          </a>
+          <a href="{% url 'sales:quotations' %}" class="btn btn-outline" style="justify-content: flex-start;">
+            📑 Commercial Quotations Archive
+          </a>
+          <a href="{% url 'catalog:list' %}" class="btn btn-outline" style="justify-content: flex-start;" target="_blank">
+            🔎 Browse Equipment Specs &nearr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Trade Desk Resources Card -->
+      <div class="card" style="padding: 1.5rem;">
+        <h4 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--slate-800);">Logistics &amp; Incoterms Guide</h4>
+        <p style="font-size: 0.85rem; color: var(--slate-600); line-height: 1.6; margin-bottom: 1rem;">
+          When building proforma quotations, ensure Incoterms 2020 definitions are clearly maintained:
+        </p>
+        <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.825rem; color: var(--slate-600); line-height: 1.7;">
+          <li><strong>CIF:</strong> Includes ocean freight and marine cargo insurance up to port of discharge.</li>
+          <li><strong>FOB:</strong> Loading onto vessel at designated port; buyer assumes freight and customs.</li>
+          <li><strong>DDP:</strong> Door-to-door delivery with destination import duties pre-cleared.</li>
+        </ul>
+        <div style="margin-top: 1rem; border-top: 1px solid var(--border-subtle); padding-top: 0.75rem;">
+          <a href="{% url 'exports:info' %}" target="_blank" style="font-size: 0.85rem; font-weight: 600; color: var(--primary-700);">
+            Open Global Logistics Hub &nearr;
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

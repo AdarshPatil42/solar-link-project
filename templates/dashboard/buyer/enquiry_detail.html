@@ -1,0 +1,365 @@
+{% extends 'base.html' %}
+
+{% block title %}Enquiry {{ enquiry.enquiry_number }} — SolarLink Portal{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.5rem;">
+      <a href="{% url 'dashboard:buyer_dashboard' %}">Dashboard</a>
+      <span>/</span>
+      <a href="{% url 'dashboard:buyer_enquiries' %}">Enquiries</a>
+      <span>/</span>
+      <span style="color: var(--slate-800); font-weight: 600;">{{ enquiry.enquiry_number }}</span>
+    </nav>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+          <h1 style="font-size: 2.25rem; margin: 0;">{{ enquiry.project_name }}</h1>
+          <span style="font-family: monospace; font-size: 1.1rem; color: var(--primary-700); background: var(--primary-50); padding: 0.25rem 0.6rem; border-radius: var(--radius-sm); border: 1px solid var(--primary-200);">
+            {{ enquiry.enquiry_number }}
+          </span>
+        </div>
+        <p style="margin: 0; color: var(--slate-600); font-size: 0.95rem;">
+          Submitted on {{ enquiry.created_at|date:"F d, Y — H:i" }} UTC &bull; Destination: <strong>{{ enquiry.shipping_destination|default:enquiry.country }}</strong>
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+        {% if enquiry.quotations.first %}
+          <a href="{% url 'dashboard:buyer_quotation_detail' enquiry.quotations.first.id %}" class="btn btn-primary">
+            View Commercial Quotation ({{ enquiry.quotations.first.quote_number }}) &rarr;
+          </a>
+        {% endif %}
+        <a href="{% url 'dashboard:buyer_enquiries' %}" class="btn btn-outline">
+          &larr; Back to Enquiries
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  <!-- Visual 7-Step Milestones Progress Tracker -->
+  <div class="card" style="padding: 2rem; margin-bottom: 2.5rem;">
+    <h3 style="font-size: 1.1rem; margin-bottom: 1.75rem; color: var(--slate-800);">Procurement Milestone Pipeline</h3>
+    <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.5rem; position: relative;" class="timeline-stepper">
+      
+      <!-- Step 1: Requested -->
+      <div style="text-align: center;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; {% if enquiry.timeline_step >= 1 %}background: var(--primary-600); color: white;{% else %}background: var(--slate-200); color: var(--slate-500);{% endif %}">
+          1
+        </div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: {% if enquiry.timeline_step >= 1 %}var(--primary-800){% else %}var(--slate-400){% endif %};">
+          Requested
+        </div>
+      </div>
+
+      <!-- Step 2: Assigned -->
+      <div style="text-align: center;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; {% if enquiry.timeline_step >= 2 %}background: var(--primary-600); color: white;{% else %}background: var(--slate-200); color: var(--slate-500);{% endif %}">
+          2
+        </div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: {% if enquiry.timeline_step >= 2 %}var(--primary-800){% else %}var(--slate-400){% endif %};">
+          Assigned
+        </div>
+      </div>
+
+      <!-- Step 3: Under Review -->
+      <div style="text-align: center;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; {% if enquiry.timeline_step >= 3 %}background: var(--primary-600); color: white;{% else %}background: var(--slate-200); color: var(--slate-500);{% endif %}">
+          3
+        </div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: {% if enquiry.timeline_step >= 3 %}var(--primary-800){% else %}var(--slate-400){% endif %};">
+          Review
+        </div>
+      </div>
+
+      <!-- Step 4: Quotation Prepared -->
+      <div style="text-align: center;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; {% if enquiry.timeline_step >= 4 %}background: var(--primary-600); color: white;{% else %}background: var(--slate-200); color: var(--slate-500);{% endif %}">
+          4
+        </div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: {% if enquiry.timeline_step >= 4 %}var(--primary-800){% else %}var(--slate-400){% endif %};">
+          Pricing
+        </div>
+      </div>
+
+      <!-- Step 5: Quotation Sent -->
+      <div style="text-align: center;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; {% if enquiry.timeline_step >= 5 %}background: #0284c7; color: white;{% else %}background: var(--slate-200); color: var(--slate-500);{% endif %}">
+          5
+        </div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: {% if enquiry.timeline_step >= 5 %}#0369a1{% else %}var(--slate-400){% endif %};">
+          Quote Sent
+        </div>
+      </div>
+
+      <!-- Step 6: Negotiation -->
+      <div style="text-align: center;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; {% if enquiry.timeline_step >= 6 %}background: #eab308; color: #713f12;{% else %}background: var(--slate-200); color: var(--slate-500);{% endif %}">
+          6
+        </div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: {% if enquiry.timeline_step >= 6 %}#854d0e{% else %}var(--slate-400){% endif %};">
+          Negotiation
+        </div>
+      </div>
+
+      <!-- Step 7: Approved / Won -->
+      <div style="text-align: center;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; margin: 0 auto 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85rem; {% if enquiry.timeline_step == 7 %}background: #16a34a; color: white;{% elif enquiry.status == 'REJECTED' %}background: #dc2626; color: white;{% else %}background: var(--slate-200); color: var(--slate-500);{% endif %}">
+          {% if enquiry.status == 'REJECTED' %}&times;{% else %}✓{% endif %}
+        </div>
+        <div style="font-size: 0.75rem; font-weight: 600; color: {% if enquiry.timeline_step == 7 %}#15803d{% elif enquiry.status == 'REJECTED' %}#b91c1c{% else %}var(--slate-400){% endif %};">
+          {% if enquiry.status == 'REJECTED' %}Declined{% else %}Approved{% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 360px; gap: 2.5rem; align-items: start;">
+
+    <!-- Left Main Column -->
+    <div>
+      <!-- Project Specs Details -->
+      <div class="card" style="padding: 1.75rem; margin-bottom: 2rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+          Project Parameters &amp; Shipping Scope
+        </h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 1.5rem;">
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase;">Application Type</span>
+            <div style="font-weight: 600; color: var(--slate-800); font-size: 1rem;">
+              {{ enquiry.get_application_type_display|default:'Renewable Energy' }}
+            </div>
+          </div>
+
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase;">Project Capacity</span>
+            <div style="font-weight: 600; color: var(--slate-800); font-size: 1rem;">
+              {{ enquiry.estimated_capacity|default:'Not specified' }}
+            </div>
+          </div>
+
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase;">Preferred Incoterm</span>
+            <div style="font-weight: 600; color: var(--primary-700); font-size: 1rem;">
+              {{ enquiry.preferred_incoterm|default:'CIF' }}
+            </div>
+          </div>
+
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase;">Target Delivery Date</span>
+            <div style="font-weight: 600; color: var(--slate-800); font-size: 1rem;">
+              {{ enquiry.target_delivery_date|date:"F d, Y"|default:'Immediate / Standard' }}
+            </div>
+          </div>
+
+          <div>
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--slate-400); text-transform: uppercase;">Discharge Destination</span>
+            <div style="font-weight: 600; color: var(--slate-800); font-size: 1rem;">
+              {{ enquiry.shipping_destination|default:enquiry.country }}
+            </div>
+          </div>
+        </div>
+
+        {% if enquiry.description %}
+          <div style="background: var(--slate-50); padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+            <span style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase; display: block; margin-bottom: 0.5rem;">Engineering Notes &amp; Scope Requirements:</span>
+            <p style="margin: 0; color: var(--slate-700); font-size: 0.95rem; white-space: pre-line; line-height: 1.6;">
+              {{ enquiry.description }}
+            </p>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Line Items Section -->
+      <div class="card" style="padding: 1.75rem; margin-bottom: 2rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+          Equipment BOM (Bill of Materials) Requested
+        </h3>
+
+        {% if enquiry.items.all %}
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Product / Equipment</th>
+                  <th>Category</th>
+                  <th>Quantity</th>
+                  <th>Target Price</th>
+                  <th>Technical Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in enquiry.items.all %}
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600; color: var(--slate-900);">
+                        <a href="{% url 'catalog:detail' item.product.slug %}" target="_blank" style="color: var(--primary-700);">
+                          {{ item.product.name }} &nearr;
+                        </a>
+                      </div>
+                      <div style="font-size: 0.8rem; color: var(--slate-500);">
+                        {{ item.product.brand }} &bull; SKU: {{ item.product.product_code }}
+                      </div>
+                    </td>
+                    <td>
+                      <span class="badge badge-secondary">{{ item.product.category.name }}</span>
+                    </td>
+                    <td>
+                      <strong style="font-size: 1rem;">{{ item.quantity|default:1 }} units</strong>
+                    </td>
+                    <td>
+                      {% if item.target_price_usd %}
+                        ${{ item.target_price_usd|floatformat:2 }} USD
+                      {% else %}
+                        <span style="color: var(--slate-400);">Market Quote</span>
+                      {% endif %}
+                    </td>
+                    <td style="font-size: 0.85rem; color: var(--slate-600);">
+                      {{ item.notes|default:'Standard datasheet specs' }}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p style="color: var(--slate-500); margin: 0;">No individual line items listed. Custom project turnkey scope.</p>
+        {% endif %}
+      </div>
+
+      <!-- Quotations Section -->
+      {% if enquiry.quotations.all %}
+        <div class="card" style="padding: 1.75rem; border-top: 4px solid var(--primary-600);">
+          <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+            Commercial Quotations Issued
+          </h3>
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Quote Ref</th>
+                  <th>Amount</th>
+                  <th>Incoterm</th>
+                  <th>Valid Until</th>
+                  <th>Status</th>
+                  <th style="text-align: right;">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for quote in enquiry.quotations.all %}
+                  <tr>
+                    <td>
+                      <strong style="font-family: monospace; color: var(--primary-700);">{{ quote.quote_number }}</strong>
+                    </td>
+                    <td>
+                      <strong style="font-size: 1.05rem; color: var(--slate-900);">
+                        {{ quote.currency }} {{ quote.total_amount|floatformat:2 }}
+                      </strong>
+                    </td>
+                    <td><span class="badge badge-secondary">{{ quote.incoterm }}</span></td>
+                    <td style="font-size: 0.85rem; color: var(--slate-500);">{{ quote.valid_until|date:"d M Y" }}</td>
+                    <td>
+                      {% if quote.status == 'SENT' %}
+                        <span class="badge badge-primary">Awaiting Review</span>
+                      {% elif quote.status == 'ACCEPTED' %}
+                        <span class="badge badge-success">Accepted</span>
+                      {% elif quote.status == 'NEGOTIATING' %}
+                        <span class="badge badge-warning">Negotiating</span>
+                      {% elif quote.status == 'DECLINED' %}
+                        <span class="badge badge-danger">Declined</span>
+                      {% endif %}
+                    </td>
+                    <td style="text-align: right;">
+                      <a href="{% url 'dashboard:buyer_quotation_detail' quote.id %}" class="btn btn-primary btn-sm">
+                        Review Quotation &rarr;
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+
+    <!-- Right Sidebar Column -->
+    <div>
+
+      <!-- Assigned Sales Rep Card -->
+      <div class="card" style="padding: 1.5rem; margin-bottom: 1.75rem;">
+        <h4 style="font-size: 1rem; margin-bottom: 1rem; color: var(--slate-800);">Assigned Sales Engineer</h4>
+        {% if enquiry.assigned_sales_rep %}
+          <div style="display: flex; gap: 0.75rem; align-items: center; margin-bottom: 1rem;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--primary-100); color: var(--primary-700); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.1rem;">
+              {{ enquiry.assigned_sales_rep.first_name|first|default:'S' }}
+            </div>
+            <div>
+              <div style="font-weight: 700; color: var(--slate-900);">
+                {{ enquiry.assigned_sales_rep.get_full_name|default:enquiry.assigned_sales_rep.username }}
+              </div>
+              <div style="font-size: 0.8rem; color: var(--slate-500);">International Trade Desk</div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.85rem; line-height: 1.7; color: var(--slate-600); border-top: 1px solid var(--border-subtle); padding-top: 0.75rem;">
+            <div><strong>Email:</strong> <a href="mailto:{{ enquiry.assigned_sales_rep.email }}">{{ enquiry.assigned_sales_rep.email }}</a></div>
+            {% if enquiry.assigned_sales_rep.profile.phone_number %}
+              <div><strong>Direct Phone:</strong> {{ enquiry.assigned_sales_rep.profile.phone_number }}</div>
+              <div style="margin-top: 0.75rem;">
+                <a href="https://wa.me/{{ enquiry.assigned_sales_rep.profile.phone_number|cut:' '|cut:'+' }}" target="_blank" class="btn btn-secondary btn-sm" style="width: 100%; justify-content: center; color: #16a34a;">
+                  Chat on WhatsApp &rarr;
+                </a>
+              </div>
+            {% endif %}
+          </div>
+        {% else %}
+          <div style="padding: 1rem; background: var(--slate-50); border-radius: var(--radius-sm); text-align: center; color: var(--slate-500); font-size: 0.85rem;">
+            Triage in progress. An export sales engineer is being assigned to your enquiry.
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Audit History Card -->
+      <div class="card" style="padding: 1.5rem;">
+        <h4 style="font-size: 1rem; margin-bottom: 1rem; color: var(--slate-800);">Activity &amp; Audit Log</h4>
+        
+        {% if enquiry.status_history.all %}
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            {% for log in enquiry.status_history.all %}
+              <div style="position: relative; padding-left: 1.25rem; border-left: 2px solid var(--primary-300);">
+                <div style="font-size: 0.75rem; color: var(--slate-400); margin-bottom: 0.15rem;">
+                  {{ log.created_at|date:"d M Y, H:i" }}
+                </div>
+                <div style="font-weight: 600; font-size: 0.85rem; color: var(--slate-800);">
+                  {{ log.to_status }}
+                </div>
+                {% if log.comment %}
+                  <div style="font-size: 0.8rem; color: var(--slate-600); margin-top: 0.2rem; background: var(--slate-50); padding: 0.35rem 0.5rem; border-radius: 4px;">
+                    {{ log.comment }}
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div style="font-size: 0.85rem; color: var(--slate-500);">
+            Enquiry logged into system on {{ enquiry.created_at|date:"d M Y" }}.
+          </div>
+        {% endif %}
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

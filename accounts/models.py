@@ -37,6 +37,10 @@ class UserProfile(models.Model):
     def is_admin(self):
         return self.role == UserRole.ADMIN or self.user.is_superuser
 
+    @property
+    def phone_number(self):
+        return self.phone
+
 
 class SavedProduct(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='saved_products')

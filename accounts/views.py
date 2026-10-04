@@ -87,6 +87,6 @@ def dashboard_redirect_view(request):
     if profile.is_admin or request.user.is_superuser:
         return redirect('dashboard:admin_dashboard')
     elif profile.is_sales:
-        return redirect('dashboard:sales_dashboard')
+        return redirect('sales:dashboard')
     else:
         return redirect('dashboard:buyer_dashboard')

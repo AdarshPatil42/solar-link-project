@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}My Saved Equipment Wishlist — SolarLink{% endblock %}
+
+{% block content %}
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <nav style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.5rem;">
+          <a href="{% url 'dashboard:buyer_dashboard' %}">Dashboard</a>
+          <span>/</span>
+          <span style="color: var(--slate-800); font-weight: 600;">Saved Wishlist</span>
+        </nav>
+        <h1 style="font-size: 2.25rem; margin: 0;">My Saved Equipment</h1>
+      </div>
+      <a href="{% url 'catalog:list' %}" class="btn btn-secondary">
+        + Browse More Equipment
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 3rem; padding-bottom: 5rem;">
+  {% if saved_items %}
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.75rem;">
+      {% for item in saved_items %}
+        <div class="card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span class="badge badge-primary">{{ item.product.category.name }}</span>
+              <span style="font-size: 0.75rem; color: var(--slate-400);">Saved {{ item.created_at|date:"d M Y" }}</span>
+            </div>
+
+            <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem;">
+              <a href="{% url 'catalog:detail' item.product.slug %}" style="color: var(--slate-900);">
+                {{ item.product.name }}
+              </a>
+            </h3>
+
+            <div style="font-size: 0.825rem; color: var(--slate-500); font-weight: 600; text-transform: uppercase; margin-bottom: 0.75rem;">
+              {{ item.product.brand }} &bull; SKU: {{ item.product.product_code }}
+            </div>
+
+            <p style="font-size: 0.875rem; color: var(--slate-600); line-height: 1.5; margin-bottom: 1rem;">
+              {{ item.product.short_description|truncatewords:20 }}
+            </p>
+
+            <div style="background: var(--slate-50); padding: 0.6rem 0.85rem; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+              <span style="font-size: 0.8rem; color: var(--slate-500);">Output Power:</span>
+              <strong style="color: var(--primary-700);">{{ item.product.display_power|default:'Certified Spec' }}</strong>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; border-top: 1px solid var(--border-subtle); padding-top: 1rem; align-items: center;">
+            <a href="{% url 'enquiries:project' %}?product={{ item.product.id }}" class="btn btn-primary btn-sm" style="flex: 1;">
+              Request RFQ &rarr;
+            </a>
+            <a href="{% url 'catalog:detail' item.product.slug %}" class="btn btn-outline btn-sm">
+              Specs
+            </a>
+            <a href="{% url 'catalog:toggle_saved' item.product.id %}" class="btn btn-secondary btn-sm" title="Remove from Saved" style="color: var(--color-danger);">
+              &times;
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card" style="padding: 4rem 2rem; text-align: center;">
+      <h3>Your saved equipment list is empty</h3>
+      <p style="color: var(--slate-500); max-width: 450px; margin: 0.5rem auto 1.5rem;">
+        Click the bookmark icon on any product in the catalog to save it to your dashboard for quick RFQ generation.
+      </p>
+      <a href="{% url 'catalog:list' %}" class="btn btn-primary">Browse Solar Equipment Catalog</a>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
