@@ -1,11 +1,16 @@
+import csv
 from datetime import date, timedelta
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Sum, Count
 from accounts.decorators import buyer_required, sales_required, admin_required
-from accounts.models import SavedProduct, UserRole
-from enquiries.models import Enquiry, EnquiryItem, EnquiryStatusHistory, EnquiryStatus, Quotation, QuotationItem
+from accounts.models import UserProfile, UserRole, SavedProduct
+from catalog.models import Product, Category
+from certifications.models import Certification
+from enquiries.models import Enquiry, EnquiryItem, EnquiryStatusHistory, EnquiryStatus, ProjectType, Quotation, QuotationItem
 from .forms import QuotationCreateForm, EnquiryStatusUpdateForm, BuyerQuoteResponseForm
 
 
@@ -439,8 +444,264 @@ def sales_pipeline_board_view(request):
 
 
 # ==========================================
-# ADMIN PLACEHOLDER (Prepared for Phase 5)
+# PHASE 5: ADMIN CONTROL CENTER & ANALYTICS
 # ==========================================
 @admin_required
 def admin_dashboard_view(request):
-    return render(request, 'dashboard/admin.html', {'profile': request.user.profile})
+    """
+    Executive Admin Operations Hub & Analytics Command:
+    High-level platform KPIs, catalog distributions, RFQ application breakdown,
+    pipeline deal conversion metrics, and 5x CSV export actions.
+    """
+    # 1. Executive Topline Metrics
+    total_products = Product.objects.count()
+    total_categories = Category.objects.count()
+    total_certifications = Certification.objects.count()
+    total_buyers = UserProfile.objects.filter(role=UserRole.BUYER).count()
+    total_sales_reps = UserProfile.objects.filter(role=UserRole.SALES).count()
+    
+    total_enquiries = Enquiry.objects.count()
+    won_enquiries = Enquiry.objects.filter(status=EnquiryStatus.APPROVED).count()
+    in_negotiation = Enquiry.objects.filter(status=EnquiryStatus.NEGOTIATION).count()
+    under_review = Enquiry.objects.filter(status__in=[EnquiryStatus.REQUESTED, EnquiryStatus.ASSIGNED, EnquiryStatus.UNDER_REVIEW]).count()
+    
+    total_quotes = Quotation.objects.count()
+    quote_aggregates = Quotation.objects.aggregate(total_val=Sum('total_amount'))
+    total_quote_value = quote_aggregates['total_val'] or 0.00
+    
+    won_aggregates = Quotation.objects.filter(status=Quotation.QuotationStatus.ACCEPTED).aggregate(won_val=Sum('total_amount'))
+    won_quote_value = won_aggregates['won_val'] or 0.00
+    
+    conversion_rate = f"{(won_enquiries / total_enquiries * 100):.1f}%" if total_enquiries > 0 else "0.0%"
+
+    # 2. Analytics Distributions
+    # A. Enquiries by Project Type
+    project_types_data = []
+    for code, label in ProjectType.choices:
+        cnt = Enquiry.objects.filter(project_type=code).count()
+        pct = round((cnt / total_enquiries * 100), 1) if total_enquiries > 0 else 0
+        project_types_data.append({'code': code, 'label': label, 'count': cnt, 'percentage': pct})
+    project_types_data.sort(key=lambda x: x['count'], reverse=True)
+
+    # B. Products by Category
+    categories_data = []
+    for cat in Category.objects.annotate(p_count=Count('products')):
+        pct = round((cat.p_count / total_products * 100), 1) if total_products > 0 else 0
+        categories_data.append({'name': cat.name, 'count': cat.p_count, 'percentage': pct})
+    categories_data.sort(key=lambda x: x['count'], reverse=True)
+
+    # C. Pipeline Deal Stages Breakdown
+    stages_data = []
+    for code, label in EnquiryStatus.choices:
+        cnt = Enquiry.objects.filter(status=code).count()
+        stages_data.append({'code': code, 'label': label, 'count': cnt})
+
+    # D. Top Destination Export Markets
+    top_destinations = Enquiry.objects.values('country').annotate(count=Count('id')).order_by('-count')[:5]
+
+    # 3. Recent Activity Lists
+    recent_enquiries = Enquiry.objects.select_related('buyer', 'assigned_sales_rep').order_by('-created_at')[:5]
+    recent_quotations = Quotation.objects.select_related('enquiry', 'sales_rep').order_by('-created_at')[:5]
+    recent_buyers = User.objects.filter(profile__role=UserRole.BUYER).select_related('profile').order_by('-date_joined')[:5]
+
+    context = {
+        'profile': request.user.profile,
+        'total_products': total_products,
+        'total_categories': total_categories,
+        'total_certifications': total_certifications,
+        'total_buyers': total_buyers,
+        'total_sales_reps': total_sales_reps,
+        'total_enquiries': total_enquiries,
+        'won_enquiries': won_enquiries,
+        'in_negotiation': in_negotiation,
+        'under_review': under_review,
+        'total_quotes': total_quotes,
+        'total_quote_value': total_quote_value,
+        'won_quote_value': won_quote_value,
+        'conversion_rate': conversion_rate,
+        'project_types_data': project_types_data,
+        'categories_data': categories_data,
+        'stages_data': stages_data,
+        'top_destinations': top_destinations,
+        'recent_enquiries': recent_enquiries,
+        'recent_quotations': recent_quotations,
+        'recent_buyers': recent_buyers,
+    }
+    return render(request, 'dashboard/admin.html', context)
+
+
+# ==========================================
+# 5X CSV DATA EXPORT ENGINES
+# ==========================================
+@admin_required
+def export_products_csv(request):
+    """
+    Exports full equipment catalog with technical attributes and specifications.
+    """
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="SolarLink_Products_Export.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow([
+        'Product Code', 'Product Name', 'Category', 'Brand',
+        'Power Rating', 'Model Number', 'Short Description',
+        'Warranty Terms', 'Created Date'
+    ])
+    
+    products = Product.objects.select_related('category', 'warranty').all().order_by('category__name', 'name')
+    for p in products:
+        warranty_str = f"{p.warranty.warranty_years} Years ({p.warranty.warranty_type})" if hasattr(p, 'warranty') and p.warranty else "Standard Export Warranty"
+        writer.writerow([
+            p.product_code,
+            p.name,
+            p.category.name if p.category else 'General',
+            p.brand,
+            p.display_power or 'Certified Spec',
+            p.model_number or '',
+            p.short_description or '',
+            warranty_str,
+            p.created_at.strftime('%Y-%m-%d') if p.created_at else ''
+        ])
+    return response
+
+
+@admin_required
+def export_enquiries_csv(request):
+    """
+    Exports all project RFQs and equipment leads with contact and scope details.
+    """
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="SolarLink_Enquiries_Export.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow([
+        'Enquiry Ref', 'Buyer Name', 'Company Name', 'Email', 'Phone',
+        'Country', 'Project Name', 'Project Type', 'Capacity',
+        'Destination Port', 'Preferred Incoterm', 'Milestone Stage',
+        'Assigned Sales Rep', 'Date Submitted'
+    ])
+    
+    enquiries = Enquiry.objects.select_related('assigned_sales_rep').all().order_by('-created_at')
+    for enq in enquiries:
+        rep_name = enq.assigned_sales_rep.get_full_name() or enq.assigned_sales_rep.username if enq.assigned_sales_rep else 'Unassigned'
+        writer.writerow([
+            enq.enquiry_number,
+            enq.full_name,
+            enq.company_name,
+            enq.email,
+            enq.phone,
+            enq.country,
+            enq.project_name,
+            enq.get_project_type_display(),
+            enq.required_capacity,
+            enq.shipping_destination,
+            enq.preferred_incoterm,
+            enq.get_status_display(),
+            rep_name,
+            enq.created_at.strftime('%Y-%m-%d %H:%M') if enq.created_at else ''
+        ])
+    return response
+
+
+@admin_required
+def export_buyers_csv(request):
+    """
+    Exports registered international buyers dossier with RFQ submission statistics.
+    """
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="SolarLink_Buyers_Export.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow([
+        'Username', 'Full Name', 'Email', 'Company Name',
+        'Country', 'Phone', 'Job Title', 'Total RFQs Submitted', 'Date Joined'
+    ])
+    
+    buyers = User.objects.filter(profile__role=UserRole.BUYER).select_related('profile').annotate(enquiry_count=Count('enquiries')).order_by('-date_joined')
+    for b in buyers:
+        profile = getattr(b, 'profile', None)
+        writer.writerow([
+            b.username,
+            b.get_full_name() or b.username,
+            b.email,
+            profile.company_name if profile else '',
+            profile.country if profile else '',
+            profile.phone if profile else '',
+            profile.job_title if profile else '',
+            b.enquiry_count,
+            b.date_joined.strftime('%Y-%m-%d') if b.date_joined else ''
+        ])
+    return response
+
+
+@admin_required
+def export_quotations_csv(request):
+    """
+    Exports issued commercial proforma quotations, currency values, and buyer decision status.
+    """
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="SolarLink_Quotations_Export.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow([
+        'Quote Ref', 'Enquiry Ref', 'Project Name', 'Buyer Company',
+        'Sales Executive', 'Total Amount', 'Currency', 'Incoterm',
+        'Payment Terms', 'Valid Until', 'Quotation Status', 'Issued Date'
+    ])
+    
+    quotes = Quotation.objects.select_related('enquiry', 'sales_rep').all().order_by('-created_at')
+    for q in quotes:
+        rep_name = q.sales_rep.get_full_name() or q.sales_rep.username if q.sales_rep else ''
+        writer.writerow([
+            q.quote_number,
+            q.enquiry.enquiry_number if q.enquiry else '',
+            q.enquiry.project_name if q.enquiry else '',
+            q.enquiry.company_name if q.enquiry else '',
+            rep_name,
+            f"{q.total_amount:.2f}",
+            q.currency,
+            q.incoterm,
+            q.payment_terms,
+            q.valid_until.strftime('%Y-%m-%d') if q.valid_until else '',
+            q.get_status_display(),
+            q.created_at.strftime('%Y-%m-%d %H:%M') if q.created_at else ''
+        ])
+    return response
+
+
+@admin_required
+def export_pipeline_csv(request):
+    """
+    Exports active commercial deal pipeline opportunities and current negotiation stages.
+    """
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="SolarLink_Sales_Pipeline_Export.csv"'
+    
+    writer = csv.writer(response)
+    writer.writerow([
+        'Enquiry Ref', 'Project Name', 'Client Company', 'Country',
+        'Destination Port', 'Project Type', 'Capacity', 'Milestone Stage',
+        'Assigned Sales Rep', 'Latest Quote Ref', 'Quote Value',
+        'Incoterm', 'Last Activity'
+    ])
+    
+    deals = Enquiry.objects.select_related('assigned_sales_rep').prefetch_related('quotations').all().order_by('status', '-updated_at')
+    for d in deals:
+        rep_name = d.assigned_sales_rep.get_full_name() or d.assigned_sales_rep.username if d.assigned_sales_rep else 'Unassigned'
+        latest_quote = d.quotations.first()
+        writer.writerow([
+            d.enquiry_number,
+            d.project_name,
+            d.company_name or d.full_name,
+            d.country,
+            d.shipping_destination,
+            d.get_project_type_display(),
+            d.required_capacity,
+            d.get_status_display(),
+            rep_name,
+            latest_quote.quote_number if latest_quote else 'None',
+            f"{latest_quote.currency} {latest_quote.total_amount:.2f}" if latest_quote else 'Pending Quote',
+            latest_quote.incoterm if latest_quote else d.preferred_incoterm,
+            d.updated_at.strftime('%Y-%m-%d %H:%M') if d.updated_at else ''
+        ])
+    return response

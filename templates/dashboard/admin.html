@@ -1,27 +1,391 @@
 {% extends 'base.html' %}
 
-{% block title %}Administrator Operations Hub — SolarLink{% endblock %}
+{% block title %}Executive Operations Hub &amp; Analytics — SolarLink{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-    <div>
-      <span class="badge badge-primary">Administrator Hub</span>
-      <h1 style="margin-top: 0.5rem;">System Administration</h1>
-      <p style="margin-bottom: 0;">Full governance over catalog, users, quotations, and CSV reporting</p>
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3rem 0 2rem;">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem;">
+          <span class="badge badge-primary">Administrator Control Hub</span>
+          <span style="font-size: 0.85rem; color: var(--slate-500);">Executive Analytics &bull; Platform Governance</span>
+        </div>
+        <h1 style="font-size: 2.25rem; margin-bottom: 0.25rem;">
+          Global Operations &amp; Commercial Analytics
+        </h1>
+        <p style="margin: 0; color: var(--slate-600); font-size: 1rem;">
+          Cross-border solar equipment catalog governance, RFQ demand intelligence, and export revenue monitoring.
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+        <a href="/admin/" target="_blank" class="btn btn-primary" id="btn-django-admin">
+          🛡️ Django Admin Console &nearr;
+        </a>
+        <a href="{% url 'sales:pipeline' %}" class="btn btn-secondary">
+          Deal Pipeline &rarr;
+        </a>
+        <a href="{% url 'sales:dashboard' %}" class="btn btn-outline">
+          Sales Workspace
+        </a>
+      </div>
     </div>
-    <div style="display:flex;gap:0.75rem;">
-      <a href="/admin/" target="_blank" class="btn btn-secondary">Django Admin &rarr;</a>
-      <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Edit Profile</a>
+  </div>
+</div>
+
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 5rem;">
+
+  <!-- 5 Executive KPI Cards -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.25rem; margin-bottom: 3rem;">
+    
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid var(--primary-600);">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Equipment in Catalog</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: var(--slate-900); margin: 0.25rem 0;">
+        {{ total_products }}
+      </div>
+      <div style="font-size: 0.8rem; color: var(--slate-500);">
+        Across {{ total_categories }} categories &bull; {{ total_certifications }} standards
+      </div>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid #8b5cf6;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">International Buyers</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: #8b5cf6; margin: 0.25rem 0;">
+        {{ total_buyers }}
+      </div>
+      <div style="font-size: 0.8rem; color: var(--slate-500);">
+        {{ total_sales_reps }} dedicated sales engineers
+      </div>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid var(--accent-sun-500);">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Total Project RFQs</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: var(--accent-sun-600); margin: 0.25rem 0;">
+        {{ total_enquiries }}
+      </div>
+      <div style="font-size: 0.8rem; color: var(--slate-500);">
+        {{ under_review }} in triage &bull; {{ in_negotiation }} in negotiation
+      </div>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid #0284c7;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Commercial Quote Volume</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: #0284c7; margin: 0.25rem 0;">
+        ${{ total_quote_value|floatformat:0 }}
+      </div>
+      <div style="font-size: 0.8rem; color: var(--slate-500);">
+        {{ total_quotes }} official proformas issued
+      </div>
+    </div>
+
+    <div class="card" style="padding: 1.5rem; border-left: 4px solid #16a34a;">
+      <div style="font-size: 0.75rem; font-weight: 700; color: var(--slate-500); text-transform: uppercase;">Confirmed Won Revenue</div>
+      <div style="font-size: 2.25rem; font-weight: 800; font-family: var(--font-heading); color: #16a34a; margin: 0.25rem 0;">
+        ${{ won_quote_value|floatformat:0 }}
+      </div>
+      <div style="font-size: 0.8rem; color: #166534; font-weight: 600;">
+        {{ won_enquiries }} won deals &bull; {{ conversion_rate }} win rate
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 5x Instant CSV Reporting Console -->
+  <div class="card" style="padding: 2rem; margin-bottom: 3rem; background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <h2 style="font-size: 1.35rem; margin: 0;">Instant CSV Data Export Engine</h2>
+          <span class="badge badge-primary">5 Comprehensive Formats</span>
+        </div>
+        <p style="margin: 0.25rem 0 0; color: var(--slate-600); font-size: 0.9rem;">
+          Direct streaming CSV downloads for compliance, ERP integration, trade logistics, and CRM reporting.
+        </p>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;">
+      
+      <!-- Export 1: Products -->
+      <a href="{% url 'dashboard:export_products_csv' %}" class="card" style="padding: 1.25rem; text-decoration: none; border: 1px solid var(--border-subtle); display: block; transition: all var(--transition-fast);" onmouseover="this.style.borderColor='var(--primary-500)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-subtle)'; this.style.transform='none';">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 1.5rem;">📦</span>
+          <span class="badge badge-secondary" style="font-size: 0.7rem;">Products.csv</span>
+        </div>
+        <strong style="color: var(--slate-900); font-size: 1rem; display: block; margin-bottom: 0.25rem;">
+          Equipment Catalog
+        </strong>
+        <p style="margin: 0; font-size: 0.8rem; color: var(--slate-500); line-height: 1.5;">
+          SKUs, brands, power ratings, model specs, warranties, and categories.
+        </p>
+        <div style="margin-top: 0.75rem; font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">
+          Download CSV &darr;
+        </div>
+      </a>
+
+      <!-- Export 2: Enquiries -->
+      <a href="{% url 'dashboard:export_enquiries_csv' %}" class="card" style="padding: 1.25rem; text-decoration: none; border: 1px solid var(--border-subtle); display: block; transition: all var(--transition-fast);" onmouseover="this.style.borderColor='var(--primary-500)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-subtle)'; this.style.transform='none';">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 1.5rem;">📋</span>
+          <span class="badge badge-secondary" style="font-size: 0.7rem;">Enquiries.csv</span>
+        </div>
+        <strong style="color: var(--slate-900); font-size: 1rem; display: block; margin-bottom: 0.25rem;">
+          Project RFQs &amp; Leads
+        </strong>
+        <p style="margin: 0; font-size: 0.8rem; color: var(--slate-500); line-height: 1.5;">
+          Client contact dossier, capacities, destinations, Incoterms, and stages.
+        </p>
+        <div style="margin-top: 0.75rem; font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">
+          Download CSV &darr;
+        </div>
+      </a>
+
+      <!-- Export 3: Buyers -->
+      <a href="{% url 'dashboard:export_buyers_csv' %}" class="card" style="padding: 1.25rem; text-decoration: none; border: 1px solid var(--border-subtle); display: block; transition: all var(--transition-fast);" onmouseover="this.style.borderColor='var(--primary-500)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-subtle)'; this.style.transform='none';">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 1.5rem;">👥</span>
+          <span class="badge badge-secondary" style="font-size: 0.7rem;">Buyers.csv</span>
+        </div>
+        <strong style="color: var(--slate-900); font-size: 1rem; display: block; margin-bottom: 0.25rem;">
+          Registered Buyers
+        </strong>
+        <p style="margin: 0; font-size: 0.8rem; color: var(--slate-500); line-height: 1.5;">
+          International EPCs, distributors, company names, emails, and RFQ totals.
+        </p>
+        <div style="margin-top: 0.75rem; font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">
+          Download CSV &darr;
+        </div>
+      </a>
+
+      <!-- Export 4: Quotations -->
+      <a href="{% url 'dashboard:export_quotations_csv' %}" class="card" style="padding: 1.25rem; text-decoration: none; border: 1px solid var(--border-subtle); display: block; transition: all var(--transition-fast);" onmouseover="this.style.borderColor='var(--primary-500)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-subtle)'; this.style.transform='none';">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 1.5rem;">📑</span>
+          <span class="badge badge-secondary" style="font-size: 0.7rem;">Quotations.csv</span>
+        </div>
+        <strong style="color: var(--slate-900); font-size: 1rem; display: block; margin-bottom: 0.25rem;">
+          Commercial Quotations
+        </strong>
+        <p style="margin: 0; font-size: 0.8rem; color: var(--slate-500); line-height: 1.5;">
+          Proforma quote numbers, values, payment terms, Incoterms, and statuses.
+        </p>
+        <div style="margin-top: 0.75rem; font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">
+          Download CSV &darr;
+        </div>
+      </a>
+
+      <!-- Export 5: Sales Pipeline -->
+      <a href="{% url 'dashboard:export_pipeline_csv' %}" class="card" style="padding: 1.25rem; text-decoration: none; border: 1px solid var(--border-subtle); display: block; transition: all var(--transition-fast);" onmouseover="this.style.borderColor='var(--primary-500)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='var(--border-subtle)'; this.style.transform='none';">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="font-size: 1.5rem;">📊</span>
+          <span class="badge badge-secondary" style="font-size: 0.7rem;">SalesPipeline.csv</span>
+        </div>
+        <strong style="color: var(--slate-900); font-size: 1rem; display: block; margin-bottom: 0.25rem;">
+          Deal Pipeline Kanban
+        </strong>
+        <p style="margin: 0; font-size: 0.8rem; color: var(--slate-500); line-height: 1.5;">
+          Full pipeline opportunities, sales reps, deal values, and latest stages.
+        </p>
+        <div style="margin-top: 0.75rem; font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">
+          Download CSV &darr;
+        </div>
+      </a>
+
     </div>
   </div>
 
-  <div class="card" style="padding: 2.5rem; text-align: center;">
-    <h3>Administrator Control Active</h3>
-    <p style="color: var(--slate-600); max-width: 600px; margin: 0.5rem auto 1.5rem;">
-      Your account has full <strong>Administrator</strong> privileges. Executive KPI analytics and 5x CSV Data Exports will be linked in Phase 5.
-    </p>
-    <a href="/admin/" target="_blank" class="btn btn-primary">Open Django Admin Panel</a>
+  <!-- Analytics Intelligence Grid -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+    
+    <!-- Widget 1: Demand Breakdown by Application Type -->
+    <div class="card" style="padding: 1.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+        <h3 style="font-size: 1.15rem; margin: 0;">Demand by Application Type</h3>
+        <span style="font-size: 0.8rem; color: var(--slate-500);">{{ total_enquiries }} Total RFQs</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        {% for pt in project_types_data %}
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+              <span style="font-weight: 600; color: var(--slate-800);">{{ pt.label }}</span>
+              <span style="color: var(--slate-600);"><strong>{{ pt.count }}</strong> ({{ pt.percentage }}%)</span>
+            </div>
+            <div style="height: 8px; background: var(--slate-100); border-radius: 4px; overflow: hidden;">
+              <div style="height: 100%; width: {{ pt.percentage }}%; background: linear-gradient(90deg, var(--primary-600), var(--accent-sun-500)); border-radius: 4px;"></div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Widget 2: Catalog Distribution by Category -->
+    <div class="card" style="padding: 1.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+        <h3 style="font-size: 1.15rem; margin: 0;">Equipment Distribution</h3>
+        <span style="font-size: 0.8rem; color: var(--slate-500);">{{ total_products }} SKUs Cataloged</span>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1rem;">
+        {% for cat in categories_data %}
+          <div>
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.25rem;">
+              <span style="font-weight: 600; color: var(--slate-800);">{{ cat.name }}</span>
+              <span style="color: var(--slate-600);"><strong>{{ cat.count }}</strong> units ({{ cat.percentage }}%)</span>
+            </div>
+            <div style="height: 8px; background: var(--slate-100); border-radius: 4px; overflow: hidden;">
+              <div style="height: 100%; width: {{ cat.percentage }}%; background: linear-gradient(90deg, #0284c7, #38bdf8); border-radius: 4px;"></div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
   </div>
+
+  <!-- Second Analytics Row: Deal Pipeline Breakdown & Top Export Destinations -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
+    
+    <!-- Widget 3: Pipeline Stage Deal Velocity -->
+    <div class="card" style="padding: 1.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+        <h3 style="font-size: 1.15rem; margin: 0;">Procurement Pipeline Distribution</h3>
+        <a href="{% url 'sales:pipeline' %}" style="font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">Open Kanban &rarr;</a>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        {% for stage in stages_data %}
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0.75rem; background: var(--slate-50); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span style="width: 8px; height: 8px; border-radius: 50%; {% if stage.code == 'APPROVED' %}background: #16a34a;{% elif stage.code == 'NEGOTIATION' %}background: #eab308;{% elif stage.code == 'QUOTATION_SENT' %}background: #0284c7;{% elif stage.code == 'REJECTED' %}background: #dc2626;{% else %}background: var(--slate-400);{% endif %}"></span>
+              <span style="font-size: 0.85rem; font-weight: 600; color: var(--slate-800);">{{ stage.label }}</span>
+            </div>
+            <strong style="font-size: 0.95rem; color: var(--slate-900);">{{ stage.count }}</strong>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Widget 4: Top Destination Export Markets -->
+    <div class="card" style="padding: 1.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+        <h3 style="font-size: 1.15rem; margin: 0;">Top Destination Export Markets</h3>
+        <a href="{% url 'exports:info' %}" style="font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">Logistics Hub &rarr;</a>
+      </div>
+
+      {% if top_destinations %}
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          {% for dest in top_destinations %}
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.65rem 0.85rem; background: var(--slate-50); border-radius: var(--radius-sm); border: 1px solid var(--border-subtle);">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <span style="font-size: 1.1rem;">🌍</span>
+                <span style="font-size: 0.9rem; font-weight: 600; color: var(--slate-800);">{{ dest.country }}</span>
+              </div>
+              <span class="badge badge-secondary" style="font-size: 0.8rem;">
+                {{ dest.count }} Project{{ dest.count|pluralize }}
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color: var(--slate-500); margin: 0;">No geographic enquiry records logged yet.</p>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Recent Operational Activity Grid -->
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+    
+    <!-- Recent Enquiries -->
+    <div class="card" style="padding: 1.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+        <h3 style="font-size: 1.15rem; margin: 0;">Recent Inbound Enquiries</h3>
+        <a href="{% url 'sales:enquiries' %}" style="font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">All Leads &rarr;</a>
+      </div>
+
+      {% if recent_enquiries %}
+        <div class="table-responsive">
+          <table class="table" style="margin: 0; font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>Ref</th>
+                <th>Project / Company</th>
+                <th>Stage</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for enq in recent_enquiries %}
+                <tr>
+                  <td><strong style="font-family: monospace; color: var(--primary-700);">{{ enq.enquiry_number }}</strong></td>
+                  <td>
+                    <div style="font-weight: 600;">{{ enq.project_name|truncatechars:24 }}</div>
+                    <div style="font-size: 0.75rem; color: var(--slate-500);">{{ enq.country }}</div>
+                  </td>
+                  <td>
+                    <span class="badge badge-secondary" style="font-size: 0.7rem;">{{ enq.get_status_display|truncatechars:16 }}</span>
+                  </td>
+                  <td style="text-align: right;">
+                    <a href="{% url 'sales:enquiry_detail' enq.id %}" class="btn btn-secondary btn-sm" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;">
+                      Manage &rarr;
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: var(--slate-500); margin: 0;">No enquiries logged yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- Recent Quotations -->
+    <div class="card" style="padding: 1.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+        <h3 style="font-size: 1.15rem; margin: 0;">Recent Commercial Offers</h3>
+        <a href="{% url 'sales:quotations' %}" style="font-size: 0.8rem; font-weight: 600; color: var(--primary-700);">All Quotes &rarr;</a>
+      </div>
+
+      {% if recent_quotations %}
+        <div class="table-responsive">
+          <table class="table" style="margin: 0; font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>Quote</th>
+                <th>Amount</th>
+                <th>Incoterm</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for q in recent_quotations %}
+                <tr>
+                  <td><strong style="font-family: monospace; color: var(--primary-700);">{{ q.quote_number }}</strong></td>
+                  <td><strong>${{ q.total_amount|floatformat:0 }}</strong></td>
+                  <td><span class="badge badge-secondary" style="font-size: 0.7rem;">{{ q.incoterm }}</span></td>
+                  <td>
+                    {% if q.status == 'ACCEPTED' %}
+                      <span class="badge badge-success" style="font-size: 0.7rem;">Won</span>
+                    {% elif q.status == 'NEGOTIATING' %}
+                      <span class="badge badge-warning" style="font-size: 0.7rem;">Negotiating</span>
+                    {% else %}
+                      <span class="badge badge-primary" style="font-size: 0.7rem;">Sent</span>
+                    {% endif %}
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <p style="color: var(--slate-500); margin: 0;">No commercial quotations prepared yet.</p>
+      {% endif %}
+    </div>
+
+  </div>
+
 </div>
 {% endblock %}

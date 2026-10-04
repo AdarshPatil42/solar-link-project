@@ -93,5 +93,13 @@ class Warranty(models.Model):
         verbose_name = 'Warranty Term'
         verbose_name_plural = 'Warranty Terms'
 
+    @property
+    def warranty_years(self):
+        return self.performance_warranty_years or self.product_warranty_years
+
+    @property
+    def warranty_type(self):
+        return f"{self.product_warranty_years}Y Product / {self.performance_warranty_years}Y Performance"
+
     def __str__(self):
         return f"Warranty: {self.product.name} ({self.product_warranty_years}y product / {self.performance_warranty_years}y perf)"

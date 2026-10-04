@@ -39,6 +39,22 @@ class DashboardPhase4Tests(TestCase):
         self.sales_profile.phone = '+97148007000'
         self.sales_profile.save()
 
+        # Create Admin user
+        self.admin_user = User.objects.create_user(
+            username='test_admin',
+            email='admin@test.com',
+            password='password123',
+            first_name='Admin',
+            is_staff=True,
+            is_superuser=True
+        )
+        self.admin_profile = self.admin_user.profile
+        self.admin_profile.role = UserRole.ADMIN
+        self.admin_profile.company_name = 'SolarLink HQ'
+        self.admin_profile.country = 'Germany'
+        self.admin_profile.phone = '+49301234567'
+        self.admin_profile.save()
+
         # Create Category & Product
         self.category = Category.objects.create(name='Solar Modules', slug='solar-modules')
         self.product = Product.objects.create(
@@ -267,3 +283,79 @@ class DashboardPhase4Tests(TestCase):
         response = self.client.get(reverse('sales:dashboard'))
         # Should be forbidden (403) or redirected
         self.assertIn(response.status_code, [302, 403])
+
+    def test_buyer_cannot_access_admin_portal(self):
+        self.client.login(username='test_buyer', password='password123')
+        response = self.client.get(reverse('dashboard:admin_dashboard'))
+        self.assertIn(response.status_code, [302, 403])
+
+    def test_buyer_cannot_export_csv(self):
+        self.client.login(username='test_buyer', password='password123')
+        response = self.client.get(reverse('dashboard:export_products_csv'))
+        self.assertIn(response.status_code, [302, 403])
+
+    # ==========================
+    # PHASE 5: ADMIN & CSV EXPORT TESTS
+    # ==========================
+    def test_admin_dashboard_view(self):
+        self.client.login(username='test_admin', password='password123')
+        response = self.client.get(reverse('dashboard:admin_dashboard'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Global Operations &amp; Commercial Analytics')
+        self.assertContains(response, 'Instant CSV Data Export Engine')
+        self.assertContains(response, 'Equipment Catalog')
+
+    def test_export_products_csv(self):
+        self.client.login(username='test_admin', password='password123')
+        response = self.client.get(reverse('dashboard:export_products_csv'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/csv; charset=utf-8')
+        self.assertIn('SolarLink_Products_Export.csv', response['Content-Disposition'])
+        content = response.content.decode('utf-8')
+        self.assertIn('Product Code,Product Name,Category', content)
+        self.assertIn(self.product.product_code, content)
+        self.assertIn('580W TOPCon Bifacial', content)
+
+    def test_export_enquiries_csv(self):
+        self.client.login(username='test_admin', password='password123')
+        response = self.client.get(reverse('dashboard:export_enquiries_csv'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/csv; charset=utf-8')
+        self.assertIn('SolarLink_Enquiries_Export.csv', response['Content-Disposition'])
+        content = response.content.decode('utf-8')
+        self.assertIn('Enquiry Ref,Buyer Name,Company Name', content)
+        self.assertIn(self.enquiry.enquiry_number, content)
+        self.assertIn('5MW Sohar Industrial Solar Farm', content)
+
+    def test_export_buyers_csv(self):
+        self.client.login(username='test_admin', password='password123')
+        response = self.client.get(reverse('dashboard:export_buyers_csv'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/csv; charset=utf-8')
+        self.assertIn('SolarLink_Buyers_Export.csv', response['Content-Disposition'])
+        content = response.content.decode('utf-8')
+        self.assertIn('Username,Full Name,Email', content)
+        self.assertIn('test_buyer', content)
+        self.assertIn('Test EPC Solar Ltd', content)
+
+    def test_export_quotations_csv(self):
+        self.client.login(username='test_admin', password='password123')
+        response = self.client.get(reverse('dashboard:export_quotations_csv'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/csv; charset=utf-8')
+        self.assertIn('SolarLink_Quotations_Export.csv', response['Content-Disposition'])
+        content = response.content.decode('utf-8')
+        self.assertIn('Quote Ref,Enquiry Ref,Project Name', content)
+        self.assertIn(self.quotation.quote_number, content)
+        self.assertIn('1032000.00', content)
+
+    def test_export_pipeline_csv(self):
+        self.client.login(username='test_admin', password='password123')
+        response = self.client.get(reverse('dashboard:export_pipeline_csv'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'text/csv; charset=utf-8')
+        self.assertIn('SolarLink_Sales_Pipeline_Export.csv', response['Content-Disposition'])
+        content = response.content.decode('utf-8')
+        self.assertIn('Enquiry Ref,Project Name,Client Company', content)
+        self.assertIn(self.enquiry.enquiry_number, content)
+        self.assertIn('5MW Sohar Industrial Solar Farm', content)
