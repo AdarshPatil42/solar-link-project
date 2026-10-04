@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Bulk Equipment RFQ & Container Allocation — SolarLink{% endblock %}
+{% block meta_description %}Request bulk containerized quotations for solar PV modules, central/string inverters, and commercial energy storage systems.{% endblock %}
+
+{% block content %}
+<!-- Bulk Header -->
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3.5rem 0 2.5rem;">
+  <div class="container" style="max-width: 860px;">
+    <span class="badge badge-sun" style="margin-bottom: 0.5rem;">FCL Container Allocation</span>
+    <h1 style="font-size: 2.4rem; margin-bottom: 0.75rem;">Bulk Quotation Request</h1>
+    <p style="color: var(--slate-600); font-size: 1.1rem; line-height: 1.6; margin-bottom: 0;">
+      For utility solar farms, multi-megawatt EPC tenders, and wholesale container distributors. Submit your combined multi-product schedule to receive direct factory volume pricing.
+    </p>
+  </div>
+</div>
+
+<div class="container" style="max-width: 860px; padding-top: 3rem; padding-bottom: 5rem;">
+  <div class="card" style="padding: 2.5rem; box-shadow: var(--shadow-lg);">
+    <form method="post" enctype="multipart/form-data" novalidate id="bulk-quote-form">
+      {% csrf_token %}
+
+      <!-- Section 1: Buyer Details -->
+      <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; color: var(--slate-900);">
+          Enterprise Procurement Details
+        </h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.full_name.id_for_label }}">Contact Officer Full Name *</label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}<div class="form-errors">{{ form.full_name.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.company_name.id_for_label }}">Enterprise / Corporate Entity *</label>
+            {{ form.company_name }}
+            {% if form.company_name.errors %}<div class="form-errors">{{ form.company_name.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.email.id_for_label }}">Corporate Email *</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="form-errors">{{ form.email.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.phone.id_for_label }}">Phone / WhatsApp *</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}<div class="form-errors">{{ form.phone.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.country.id_for_label }}">Country / Jurisdiction *</label>
+            {{ form.country }}
+            {% if form.country.errors %}<div class="form-errors">{{ form.country.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Logistics Preferences -->
+      <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; color: var(--slate-900);">
+          Maritime Destination & Trade Terms
+        </h3>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 0.8fr 1fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.shipping_destination.id_for_label }}">Destination Seaport / Terminal *</label>
+            {{ form.shipping_destination }}
+            {% if form.shipping_destination.errors %}<div class="form-errors">{{ form.shipping_destination.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.preferred_incoterm.id_for_label }}">Incoterm Requested *</label>
+            {{ form.preferred_incoterm }}
+            {% if form.preferred_incoterm.errors %}<div class="form-errors">{{ form.preferred_incoterm.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.target_delivery_date.id_for_label }}">Target Port Arrival Date</label>
+            {{ form.target_delivery_date }}
+            {% if form.target_delivery_date.errors %}<div class="form-errors">{{ form.target_delivery_date.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Equipment Bill of Quantities -->
+      <div style="margin-bottom: 2.5rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; color: var(--slate-900);">
+          Bulk Equipment Schedule & Component List
+        </h3>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.items_specification.id_for_label }}">Component Quantities & Models *</label>
+          {{ form.items_specification }}
+          <div class="form-help">{{ form.items_specification.help_text }}</div>
+          {% if form.items_specification.errors %}<div class="form-errors">{{ form.items_specification.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.attachment.id_for_label }}">Attach Tender Excel / Layout PDF (Optional)</label>
+          {{ form.attachment }}
+          <div class="form-help">Maximum file size: 10MB. Accepted formats: PDF, XLSX, DOCX, ZIP.</div>
+          {% if form.attachment.errors %}<div class="form-errors">{{ form.attachment.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-accent btn-block btn-lg" id="submit-bulk-btn">
+        Submit Bulk Container RFQ &rarr;
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,52 +1,340 @@
 {% extends 'base.html' %}
 
-{% block title %}SolarLink — Solar & Renewable Energy Equipment Export Catalog{% endblock %}
+{% block title %}SolarLink — Reliable Solar & Renewable Energy Equipment for Global Projects{% endblock %}
+{% block meta_description %}Centralized export catalog for tier-1 solar PV modules, commercial string inverters, lithium energy storage, and verified IEC certifications.{% endblock %}
 
 {% block content %}
-<!-- Phase 1 Welcome Hero -->
-<section style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); padding: 5rem 0 4rem; border-bottom: 1px solid var(--border-subtle);">
-  <div class="container" style="text-align: center; max-width: 860px;">
-    <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 1rem; background: var(--primary-100); border-radius: var(--radius-full); margin-bottom: 1.5rem;">
-      <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary-600);"></span>
-      <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-800); text-transform: uppercase; letter-spacing: 0.05em;">Phase 1: Foundation & Auth Active</span>
+<!-- ==========================================
+     HERO SECTION
+     ========================================== -->
+<section style="background: radial-gradient(circle at 80% 20%, rgba(16, 185, 129, 0.08) 0%, rgba(245, 158, 11, 0.04) 40%, #ffffff 80%); padding: 5rem 0 4rem; border-bottom: 1px solid var(--border-subtle); position: relative; overflow: hidden;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 3.5rem; align-items: center;">
+      
+      <!-- Left Column: Hero Pitch -->
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.35rem 1rem; background: var(--primary-100); border: 1px solid var(--primary-200); border-radius: var(--radius-full); margin-bottom: 1.5rem;">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary-600); box-shadow: 0 0 8px var(--primary-500);"></span>
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-900); text-transform: uppercase; letter-spacing: 0.04em;">International Renewable Energy Export Catalog</span>
+        </div>
+
+        <h1 style="font-size: 3.4rem; line-height: 1.15; margin-bottom: 1.25rem; color: var(--slate-900); letter-spacing: -0.03em;">
+          Reliable Solar & Renewable Energy Equipment for <span class="logo-accent">Global Projects</span>
+        </h1>
+
+        <p style="font-size: 1.25rem; color: var(--slate-600); line-height: 1.6; margin-bottom: 2.25rem; max-width: 620px;">
+          Connecting tier-1 solar manufacturers with international EPC contractors, project developers, and distributors. Complete technical specifications, verified certifications, and guaranteed containerized export logistics.
+        </p>
+
+        <!-- Primary Actions -->
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <a href="{% url 'catalog:list' %}" class="btn btn-primary btn-lg" id="hero-explore-btn">
+            <svg style="width:20px;height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+            </svg>
+            Explore Catalog
+          </a>
+
+          <a href="{% url 'enquiries:project' %}" class="btn btn-accent btn-lg" id="hero-quote-btn">
+            Request a Quote &rarr;
+          </a>
+
+          <a href="{% url 'enquiries:status' %}" class="btn btn-secondary btn-lg" title="Track Live Enquiry">
+            Track Enquiry
+          </a>
+        </div>
+
+        <!-- Trust Badges Bar -->
+        <div style="display: flex; gap: 2rem; margin-top: 3rem; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--slate-700); font-weight: 600;">
+            <svg style="width:20px;height:20px;color:var(--primary-600);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>TÜV & IEC Certified</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--slate-700); font-weight: 600;">
+            <svg style="width:20px;height:20px;color:var(--primary-600);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>FOB / CIF / DDP Logistics</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: var(--slate-700); font-weight: 600;">
+            <svg style="width:20px;height:20px;color:var(--primary-600);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>24/48h Quotation Turnaround</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Visual Summary Card -->
+      <div class="card" style="padding: 2.5rem; box-shadow: var(--shadow-xl); border: 1px solid var(--border-strong); background: rgba(255, 255, 255, 0.9);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1rem;">
+          <h3 style="font-size: 1.25rem; margin: 0;">Export Operations Matrix</h3>
+          <span class="badge badge-sun">2026 Ready</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="width: 42px; height: 42px; border-radius: var(--radius-md); background: var(--primary-100); color: var(--primary-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;">
+              01
+            </div>
+            <div>
+              <div style="font-weight: 700; color: var(--slate-900);">Dynamic EAV Specifications</div>
+              <div style="font-size: 0.85rem; color: var(--slate-500);">Detailed datasheets for solar panels, 3-phase hybrid inverters, and battery storage.</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="width: 42px; height: 42px; border-radius: var(--radius-md); background: var(--accent-sun-100); color: var(--accent-sun-600); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;">
+              02
+            </div>
+            <div>
+              <div style="font-weight: 700; color: var(--slate-900);">Global Incoterms Pre-Configured</div>
+              <div style="font-size: 0.85rem; color: var(--slate-500);">Ocean container shipping to UAE, Saudi Arabia, Germany, Kenya, Australia, and 15+ ports.</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 1rem; align-items: flex-start;">
+            <div style="width: 42px; height: 42px; border-radius: var(--radius-md); background: var(--primary-100); color: var(--primary-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700;">
+              03
+            </div>
+            <div>
+              <div style="font-weight: 700; color: var(--slate-900);">Live Enquiry Tracking (ENQ-YYYY-XXXXX)</div>
+              <div style="font-size: 0.85rem; color: var(--slate-500);">Full transparency from initial submission, sales review, to official quotation issuance.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 2rem; padding: 1rem; background: var(--slate-50); border-radius: var(--radius-md); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 0.75rem; color: var(--slate-500); text-transform: uppercase;">Active Lead Demo</div>
+            <div style="font-family: var(--font-mono); font-weight: 700; color: var(--primary-800);">ENQ-2026-00125</div>
+          </div>
+          <a href="{% url 'enquiries:status' %}?enquiry_number=ENQ-2026-00125" class="btn btn-outline btn-sm">
+            Inspect Live Tracker &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     GLOBAL STATS COUNTERS
+     ========================================== -->
+<section style="background: var(--slate-900); color: #ffffff; padding: 2.75rem 0;">
+  <div class="container">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; text-align: center;">
+      <div>
+        <div style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-heading); color: var(--primary-400);">{{ stats.megawatts_exported }}</div>
+        <div style="font-size: 0.9rem; color: var(--slate-300); text-transform: uppercase; letter-spacing: 0.05em;">Renewable Capacity Exported</div>
+      </div>
+      <div>
+        <div style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-heading); color: var(--accent-sun-400);">{{ stats.countries_served }}</div>
+        <div style="font-size: 0.9rem; color: var(--slate-300); text-transform: uppercase; letter-spacing: 0.05em;">International Seaports</div>
+      </div>
+      <div>
+        <div style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-heading); color: var(--primary-400);">{{ stats.quality_standard }}</div>
+        <div style="font-size: 0.9rem; color: var(--slate-300); text-transform: uppercase; letter-spacing: 0.05em;">Certified Third-Party Audits</div>
+      </div>
+      <div>
+        <div style="font-size: 2.5rem; font-weight: 800; font-family: var(--font-heading); color: var(--accent-sun-400);">{{ stats.rfq_turnaround }}</div>
+        <div style="font-size: 0.9rem; color: var(--slate-300); text-transform: uppercase; letter-spacing: 0.05em;">Commercial Quote SLA</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     TECHNOLOGY CATEGORIES SHOWCASE
+     ========================================== -->
+<section style="padding: 5rem 0; background: var(--bg-app);">
+  <div class="container">
+    <div style="text-align: center; max-width: 700px; margin: 0 auto 3.5rem;">
+      <span class="badge badge-primary" style="margin-bottom: 0.75rem;">Product Classifications</span>
+      <h2 style="font-size: 2.25rem; margin-bottom: 0.75rem;">Technology Categories</h2>
+      <p style="color: var(--slate-600); font-size: 1.05rem;">
+        Explore certified tier-1 solar photovoltaic, conversion, storage, and pumping systems engineered for global climates.
+      </p>
     </div>
 
-    <h1 style="font-size: 3.25rem; line-height: 1.15; margin-bottom: 1.5rem; color: var(--slate-900);">
-      Reliable Solar & Renewable Energy Equipment for <span class="logo-accent" style="background: linear-gradient(135deg, var(--primary-600), var(--accent-sun-500)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Global Projects</span>
-    </h1>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+      {% for cat in categories %}
+        <a href="{% url 'catalog:list' %}?category={{ cat.slug }}" class="card" style="padding: 1.75rem 1.25rem; text-align: center; transition: all var(--transition-smooth); text-decoration: none;">
+          <div class="brand-icon-wrapper" style="margin: 0 auto 1.25rem; width: 3.25rem; height: 3.25rem;">
+            <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
+          <h4 style="font-size: 1.15rem; color: var(--slate-900); margin-bottom: 0.4rem;">{{ cat.name }}</h4>
+          <p style="font-size: 0.85rem; color: var(--slate-500); margin-bottom: 0.75rem; line-height: 1.4;">{{ cat.description|truncatewords:8 }}</p>
+          <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-700);">{{ cat.product_count }} Models Listed &rarr;</span>
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
 
-    <p style="font-size: 1.25rem; color: var(--slate-600); line-height: 1.6; margin-bottom: 2.5rem;">
-      Connecting certified tier-1 manufacturers with international commercial buyers, EPC contractors, and distributors. Export-ready PV modules, hybrid inverters, and utility storage.
+<!-- ==========================================
+     FEATURED EQUIPMENT SHOWCASE
+     ========================================== -->
+<section style="padding: 5rem 0; background: #ffffff; border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <span class="badge badge-sun" style="margin-bottom: 0.5rem;">Tier-1 Commercial Flagships</span>
+        <h2 style="font-size: 2.25rem; margin-bottom: 0.25rem;">Featured Equipment Models</h2>
+        <p style="color: var(--slate-600); margin-bottom: 0;">Verified for utility installations, commercial microgrids, and extreme weather endurance.</p>
+      </div>
+      <a href="{% url 'catalog:list' %}" class="btn btn-outline">
+        View All Equipment &rarr;
+      </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+      {% for product in featured_products %}
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div style="padding: 1.25rem 1.25rem 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+            <span class="badge badge-primary">{{ product.category.name }}</span>
+            <span class="status-badge status-won" style="font-size: 0.72rem; padding: 0.2rem 0.5rem;">Export Ready</span>
+          </div>
+
+          <div class="card-body" style="padding: 0.75rem 1.25rem 1.25rem;">
+            <div style="font-size: 0.8rem; color: var(--slate-500); font-weight: 600; text-transform: uppercase;">
+              {{ product.brand }} • {{ product.product_code }}
+            </div>
+            <h3 style="font-size: 1.25rem; margin: 0.4rem 0 0.6rem;">
+              <a href="{% url 'catalog:detail' product.slug %}" style="color: var(--slate-900);">{{ product.name }}</a>
+            </h3>
+            <p style="font-size: 0.875rem; color: var(--slate-600); line-height: 1.5; margin-bottom: 1rem;">
+              {{ product.short_description }}
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; background: var(--slate-50); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1rem;">
+              <div>
+                <div style="font-size: 0.72rem; color: var(--slate-500); text-transform: uppercase;">Output Power</div>
+                <div style="font-weight: 800; color: var(--primary-700); font-size: 1rem;">{{ product.display_power|default:'Certified Spec' }}</div>
+              </div>
+              <div>
+                <div style="font-size: 0.72rem; color: var(--slate-500); text-transform: uppercase;">Technology</div>
+                <div style="font-weight: 600; color: var(--slate-800); font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ product.technology_type }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="{% url 'catalog:detail' product.slug %}" class="btn btn-outline btn-sm">Inspect Specs</a>
+            <a href="{% url 'enquiries:project' %}?product={{ product.id }}" class="btn btn-primary btn-sm">Request Quote &rarr;</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     GLOBAL EXPORT COUNTRIES PREVIEW
+     ========================================== -->
+<section style="padding: 5rem 0; background: var(--bg-app);">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 3rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <span class="badge badge-sun" style="margin-bottom: 0.5rem;">Maritime Container Shipping</span>
+        <h2 style="font-size: 2.25rem; margin-bottom: 0.25rem;">Export Destinations Served</h2>
+        <p style="color: var(--slate-600); margin-bottom: 0;">Regular container vessel departures to key global deepwater hubs.</p>
+      </div>
+      <a href="{% url 'exports:info' %}" class="btn btn-secondary">
+        View Shipping Terms & Incoterms &rarr;
+      </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1.25rem;">
+      {% for country in export_countries %}
+        <div class="card" style="padding: 1.25rem; display: flex; align-items: center; gap: 1rem;">
+          <div style="font-size: 2.25rem;">{{ country.flag_emoji }}</div>
+          <div>
+            <div style="font-weight: 700; color: var(--slate-900); font-size: 1.05rem;">{{ country.name }}</div>
+            <div style="font-size: 0.8rem; color: var(--primary-700); font-weight: 600;">{{ country.region }}</div>
+            <div style="font-size: 0.75rem; color: var(--slate-500); margin-top: 0.2rem;">{{ country.primary_ports|truncatewords:3 }}</div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     HOW IT WORKS: 7-STEP FLOWCHART
+     ========================================== -->
+<section style="padding: 5rem 0; background: #ffffff; border-top: 1px solid var(--border-subtle);">
+  <div class="container">
+    <div style="text-align: center; max-width: 700px; margin: 0 auto 3.5rem;">
+      <span class="badge badge-primary" style="margin-bottom: 0.75rem;">Seamless B2B Procurement</span>
+      <h2 style="font-size: 2.25rem; margin-bottom: 0.75rem;">How SolarLink Works</h2>
+      <p style="color: var(--slate-600); font-size: 1.05rem;">
+        From initial equipment selection to maritime container delivery, our structured export workflow eliminates communication bottlenecks.
+      </p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; text-align: center;">
+      <div class="card" style="padding: 1.25rem;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-100); color: var(--primary-700); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">1</div>
+        <h5 style="margin-bottom: 0.25rem; font-size: 0.95rem;">Browse Products</h5>
+        <p style="font-size: 0.78rem; color: var(--slate-500); margin: 0;">Explore certified PV, inverters & storage.</p>
+      </div>
+
+      <div class="card" style="padding: 1.25rem;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-100); color: var(--primary-700); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">2</div>
+        <h5 style="margin-bottom: 0.25rem; font-size: 0.95rem;">Select Equipment</h5>
+        <p style="font-size: 0.78rem; color: var(--slate-500); margin: 0;">Compare technical EAV data sheets.</p>
+      </div>
+
+      <div class="card" style="padding: 1.25rem;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-100); color: var(--primary-700); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">3</div>
+        <h5 style="margin-bottom: 0.25rem; font-size: 0.95rem;">Submit Enquiry</h5>
+        <p style="font-size: 0.78rem; color: var(--slate-500); margin: 0;">Receive instant ENQ-2026-XXXXX tracking.</p>
+      </div>
+
+      <div class="card" style="padding: 1.25rem;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-sun-100); color: var(--accent-sun-600); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">4</div>
+        <h5 style="margin-bottom: 0.25rem; font-size: 0.95rem;">Sales Review</h5>
+        <p style="font-size: 0.78rem; color: var(--slate-500); margin: 0;">Dedicated sales engineer validates BoQ.</p>
+      </div>
+
+      <div class="card" style="padding: 1.25rem;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--accent-sun-100); color: var(--accent-sun-600); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">5</div>
+        <h5 style="margin-bottom: 0.25rem; font-size: 0.95rem;">Receive Quote</h5>
+        <p style="font-size: 0.78rem; color: var(--slate-500); margin: 0;">Formal itemized quotation with Incoterms.</p>
+      </div>
+
+      <div class="card" style="padding: 1.25rem;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-100); color: var(--primary-700); font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">6</div>
+        <h5 style="margin-bottom: 0.25rem; font-size: 0.95rem;">Confirm Order</h5>
+        <p style="font-size: 0.78rem; color: var(--slate-500); margin: 0;">Accept quote or negotiate online.</p>
+      </div>
+
+      <div class="card" style="padding: 1.25rem;">
+        <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--primary-600); color: #ffffff; font-weight: 800; display: flex; align-items: center; justify-content: center; margin: 0 auto 0.75rem;">7</div>
+        <h5 style="margin-bottom: 0.25rem; font-size: 0.95rem;">Export & Delivery</h5>
+        <p style="font-size: 0.78rem; color: var(--slate-500); margin: 0;">Container maritime dispatch & clearance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==========================================
+     CALL TO ACTION BANNER
+     ========================================== -->
+<section style="padding: 4.5rem 0; background: linear-gradient(135deg, var(--primary-700), var(--slate-900)); color: #ffffff;">
+  <div class="container" style="text-align: center; max-width: 800px;">
+    <h2 style="color: #ffffff; font-size: 2.4rem; margin-bottom: 1rem;">
+      Ready to Procure Tier-1 Equipment for Your Next Solar Project?
+    </h2>
+    <p style="color: var(--slate-200); font-size: 1.15rem; margin-bottom: 2rem;">
+      Submit your project capacity and destination port for an expedited commercial quotation backed by certified third-party testing.
     </p>
-
     <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-      <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg" id="hero-get-started-btn">
-        Register Buyer Account &rarr;
+      <a href="{% url 'enquiries:project' %}" class="btn btn-accent btn-lg">
+        Submit Project Enquiry &rarr;
       </a>
-      <a href="{% url 'accounts:login' %}" class="btn btn-secondary btn-lg" id="hero-sign-in-btn">
-        Access Member Portal
+      <a href="{% url 'enquiries:bulk_quote' %}" class="btn btn-secondary btn-lg" style="background: rgba(255,255,255,0.15); color: #ffffff; border-color: rgba(255,255,255,0.3);">
+        Request Bulk Container RFQ
       </a>
-    </div>
-
-    <!-- Quick Status Cards Grid -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 4.5rem; text-align: left;">
-      <div class="card" style="padding: 1.25rem;">
-        <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary-600); text-transform: uppercase;">Architecture</div>
-        <h4 style="margin: 0.25rem 0;">7 Modular Apps</h4>
-        <p style="font-size: 0.85rem; color: var(--slate-500); margin: 0;">Accounts, Catalog, Certs, Exports, Enquiries, Pages, Dashboard.</p>
-      </div>
-
-      <div class="card" style="padding: 1.25rem;">
-        <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent-sun-600); text-transform: uppercase;">Security & Roles</div>
-        <h4 style="margin: 0.25rem 0;">Role-Based Access</h4>
-        <p style="font-size: 0.85rem; color: var(--slate-500); margin: 0;">Buyer, Sales Executive, and Admin permissions with custom profiles.</p>
-      </div>
-
-      <div class="card" style="padding: 1.25rem;">
-        <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary-600); text-transform: uppercase;">Design System</div>
-        <h4 style="margin: 0.25rem 0;">Solar SaaS Theme</h4>
-        <p style="font-size: 0.85rem; color: var(--slate-500); margin: 0;">Emerald & Amber palette, soft shadows, rounded surfaces, micro-interactions.</p>
-      </div>
     </div>
   </div>
 </section>

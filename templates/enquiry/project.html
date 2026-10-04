@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Project Enquiry & RFQ — SolarLink{% endblock %}
+{% block meta_description %}Submit your commercial solar energy project specifications for manufacturer-direct export quotation and container logistics pricing.{% endblock %}
+
+{% block content %}
+<!-- Form Header -->
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 3.5rem 0 2.5rem;">
+  <div class="container" style="max-width: 860px;">
+    <span class="badge badge-primary" style="margin-bottom: 0.5rem;">Commercial RFQ</span>
+    <h1 style="font-size: 2.4rem; margin-bottom: 0.75rem;">Commercial Project Enquiry</h1>
+    <p style="color: var(--slate-600); font-size: 1.1rem; line-height: 1.6; margin-bottom: 0;">
+      Provide your project capacity, target seaport, and preferred Incoterm. An automated tracking reference (<span style="font-family: var(--font-mono); font-weight: 700; color: var(--primary-700);">ENQ-2026-XXXXX</span>) will be issued immediately upon submission.
+    </p>
+  </div>
+</div>
+
+<div class="container" style="max-width: 860px; padding-top: 3rem; padding-bottom: 5rem;">
+
+  <!-- Preselected Product Callout -->
+  {% if preselected_product %}
+    <div class="card" style="padding: 1.25rem 1.5rem; margin-bottom: 2rem; background: var(--primary-50); border: 1px solid var(--primary-200); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--primary-600); color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800;">
+          <svg style="width:22px;height:22px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <div>
+          <div style="font-size: 0.75rem; color: var(--primary-800); text-transform: uppercase; font-weight: 700;">Selected Equipment Model</div>
+          <div style="font-weight: 700; color: var(--slate-900); font-size: 1.1rem;">{{ preselected_product.name }}</div>
+          <div style="font-size: 0.825rem; color: var(--slate-600);">SKU: {{ preselected_product.product_code }} &bull; Power: {{ preselected_product.display_power }}</div>
+        </div>
+      </div>
+      <a href="{% url 'catalog:list' %}" style="font-size: 0.85rem; color: var(--primary-800); font-weight: 600;">Change Equipment</a>
+    </div>
+  {% endif %}
+
+  <!-- Main RFQ Form -->
+  <div class="card" style="padding: 2.5rem; box-shadow: var(--shadow-lg);">
+    <form method="post" enctype="multipart/form-data" novalidate id="project-enquiry-form">
+      {% csrf_token %}
+
+      <!-- Section 1: Contact Details -->
+      <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; color: var(--slate-900); display: flex; align-items: center; gap: 0.5rem;">
+          <span style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary-100); color: var(--primary-800); display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">1</span>
+          Buyer & Enterprise Contact Details
+        </h3>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.full_name.id_for_label }}">Full Name *</label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}<div class="form-errors">{{ form.full_name.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.company_name.id_for_label }}">Company / Organization Name *</label>
+            {{ form.company_name }}
+            {% if form.company_name.errors %}<div class="form-errors">{{ form.company_name.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.email.id_for_label }}">Business Email Address *</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="form-errors">{{ form.email.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.phone.id_for_label }}">Direct Telephone / WhatsApp *</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}<div class="form-errors">{{ form.phone.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.country.id_for_label }}">Country of Buyer / Company HQ *</label>
+          {{ form.country }}
+          {% if form.country.errors %}<div class="form-errors">{{ form.country.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <!-- Section 2: Project Scope -->
+      <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 1.5rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; color: var(--slate-900); display: flex; align-items: center; gap: 0.5rem;">
+          <span style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary-100); color: var(--primary-800); display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">2</span>
+          Project Specifications & Target Delivery
+        </h3>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.project_name.id_for_label }}">Project Name / Procurement Reference *</label>
+            {{ form.project_name }}
+            {% if form.project_name.errors %}<div class="form-errors">{{ form.project_name.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.project_type.id_for_label }}">Project Classification *</label>
+            {{ form.project_type }}
+            {% if form.project_type.errors %}<div class="form-errors">{{ form.project_type.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.required_capacity.id_for_label }}">Required Total Capacity / Volume *</label>
+            {{ form.required_capacity }}
+            {% if form.required_capacity.errors %}<div class="form-errors">{{ form.required_capacity.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.project_location.id_for_label }}">Project Installation Location *</label>
+            {{ form.project_location }}
+            {% if form.project_location.errors %}<div class="form-errors">{{ form.project_location.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.shipping_destination.id_for_label }}">Destination Seaport / Terminal *</label>
+            {{ form.shipping_destination }}
+            {% if form.shipping_destination.errors %}<div class="form-errors">{{ form.shipping_destination.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.preferred_incoterm.id_for_label }}">Preferred Incoterm *</label>
+            {{ form.preferred_incoterm }}
+            {% if form.preferred_incoterm.errors %}<div class="form-errors">{{ form.preferred_incoterm.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="{{ form.expected_delivery_date.id_for_label }}">Target Delivery Date</label>
+            {{ form.expected_delivery_date }}
+            {% if form.expected_delivery_date.errors %}<div class="form-errors">{{ form.expected_delivery_date.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        {% if not preselected_product %}
+          <div style="display: grid; grid-template-columns: 1.4fr 0.6fr; gap: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" for="{{ form.product.id_for_label }}">Specific Catalog Equipment (Optional)</label>
+              {{ form.product }}
+              {% if form.product.errors %}<div class="form-errors">{{ form.product.errors.0 }}</div>{% endif %}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="{{ form.quantity.id_for_label }}">Quantity (Units / Panels)</label>
+              {{ form.quantity }}
+              {% if form.quantity.errors %}<div class="form-errors">{{ form.quantity.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+        {% else %}
+          <input type="hidden" name="product" value="{{ preselected_product.id }}">
+          <div class="form-group" style="max-width: 250px;">
+            <label class="form-label" for="{{ form.quantity.id_for_label }}">Quantity for {{ preselected_product.name }} *</label>
+            {{ form.quantity }}
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Section 3: Technical Details & Attachment -->
+      <div style="margin-bottom: 2.5rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem; color: var(--slate-900); display: flex; align-items: center; gap: 0.5rem;">
+          <span style="width: 24px; height: 24px; border-radius: 50%; background: var(--primary-100); color: var(--primary-800); display: inline-flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700;">3</span>
+          Project Notes & Tender Documents
+        </h3>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.message.id_for_label }}">Detailed Technical Scope / Bill of Quantities (BoQ) *</label>
+          {{ form.message }}
+          {% if form.message.errors %}<div class="form-errors">{{ form.message.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.attachment.id_for_label }}">Supporting Document / Tender Specs (Optional)</label>
+          {{ form.attachment }}
+          <div class="form-help">Upload project single-line diagram, layout PDF, or component spreadsheet. Max size 10MB.</div>
+          {% if form.attachment.errors %}<div class="form-errors">{{ form.attachment.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="submit-enquiry-btn">
+        Register Enquiry & Issue Tracking Number &rarr;
+      </button>
+    </form>
+  </div>
+</div>
+{% endblock %}

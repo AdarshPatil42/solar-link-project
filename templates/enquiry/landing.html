@@ -1,17 +1,107 @@
 {% extends 'base.html' %}
 
 {% block title %}Submit Project Enquiry & Request Quote — SolarLink{% endblock %}
+{% block meta_description %}Submit your commercial solar project requirements, request containerized bulk equipment quotations, or track your live enquiry status.{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
-  <div style="margin-bottom: 2rem;">
-    <h1>Commercial Project Enquiries & Bulk RFQ</h1>
-    <p>Submit your renewable energy equipment specifications for custom export pricing.</p>
+<!-- Landing Hero -->
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 4rem 0 3rem;">
+  <div class="container" style="max-width: 860px; text-align: center;">
+    <span class="badge badge-primary" style="margin-bottom: 0.75rem;">Commercial Procurement Engine</span>
+    <h1 style="font-size: 2.75rem; line-height: 1.2; margin-bottom: 1rem; color: var(--slate-900);">
+      Project Enquiries & Quotation Services
+    </h1>
+    <p style="font-size: 1.2rem; color: var(--slate-600); line-height: 1.6; margin-bottom: 0;">
+      Connect directly with our international export sales engineering desk. We provide formal itemized quotations with locked unit prices, marine freight insurance, and certified quality documentation.
+    </p>
   </div>
-  <div class="card" style="padding: 3rem; text-align: center;">
-    <h3>Enquiry & Quotation System</h3>
-    <p style="color: var(--slate-500);">Interactive Project Enquiry, Multi-Item Bulk RFQ, and tracking by ENQ-YYYY-XXXXX will be operational in Phase 3.</p>
-    <a href="{% url 'pages:home' %}" class="btn btn-secondary">Return to Home</a>
+</div>
+
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+
+  <!-- 3 Main Pathways Grid -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem; margin-bottom: 4rem;">
+
+    <!-- Pathway 1: Project Enquiry -->
+    <div class="card" style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--primary-600); box-shadow: var(--shadow-md);">
+      <div>
+        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--primary-100); color: var(--primary-700); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+          <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        </div>
+        <h3 style="font-size: 1.4rem; margin-bottom: 0.5rem;">Project RFQ</h3>
+        <p style="color: var(--slate-600); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1.5rem;">
+          Ideal for commercial rooftops, utility solar farms, or agricultural pump installations. Select a specific equipment model or provide your project capacity and target seaport.
+        </p>
+        <ul style="font-size: 0.85rem; color: var(--slate-600); line-height: 1.8; margin-bottom: 1.5rem; padding-left: 1.25rem;">
+          <li>Pre-select from catalog equipment</li>
+          <li>Choose preferred Incoterms (CIF, FOB, DDP)</li>
+          <li>Attach single-line diagrams or tender BoQs</li>
+        </ul>
+      </div>
+
+      <a href="{% url 'enquiries:project' %}" class="btn btn-primary btn-block btn-lg" id="start-project-rfq-btn">
+        Start Project Enquiry &rarr;
+      </a>
+    </div>
+
+    <!-- Pathway 2: Bulk Multi-Item RFQ -->
+    <div class="card" style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid var(--accent-sun-500); box-shadow: var(--shadow-md);">
+      <div>
+        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: var(--accent-sun-100); color: var(--accent-sun-700); display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+          <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        </div>
+        <h3 style="font-size: 1.4rem; margin-bottom: 0.5rem;">Bulk Container Request</h3>
+        <p style="color: var(--slate-600); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1.5rem;">
+          Designed for wholesale distributors, regional EPC procurement houses, and multi-megawatt projects requiring combined container allocations across modules, inverters, and racking.
+        </p>
+        <ul style="font-size: 0.85rem; color: var(--slate-600); line-height: 1.8; margin-bottom: 1.5rem; padding-left: 1.25rem;">
+          <li>Submit combined multi-component BoQ schedule</li>
+          <li>Full container load (FCL) volume discounts</li>
+          <li>Customized maritime shipping logistics</li>
+        </ul>
+      </div>
+
+      <a href="{% url 'enquiries:bulk_quote' %}" class="btn btn-accent btn-block btn-lg" id="start-bulk-rfq-btn">
+        Request Bulk RFQ &rarr;
+      </a>
+    </div>
+
+    <!-- Pathway 3: Track Live Enquiry -->
+    <div class="card" style="padding: 2.5rem; display: flex; flex-direction: column; justify-content: space-between; border-top: 4px solid #0284c7; box-shadow: var(--shadow-md);">
+      <div>
+        <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: #e0f2fe; color: #0284c7; display: flex; align-items: center; justify-content: center; margin-bottom: 1.25rem;">
+          <svg style="width:24px;height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+        </div>
+        <h3 style="font-size: 1.4rem; margin-bottom: 0.5rem;">Live Enquiry Tracking</h3>
+        <p style="color: var(--slate-600); font-size: 0.925rem; line-height: 1.6; margin-bottom: 1.5rem;">
+          Already submitted an enquiry? Check real-time review progress, sales executive assignment, and quotation status using your tracking number (e.g. ENQ-2026-00125).
+        </p>
+        <ul style="font-size: 0.85rem; color: var(--slate-600); line-height: 1.8; margin-bottom: 1.5rem; padding-left: 1.25rem;">
+          <li>Real-time 7-step visual status timeline</li>
+          <li>View assigned sales engineer contact</li>
+          <li>Review issued commercial quotation</li>
+        </ul>
+      </div>
+
+      <a href="{% url 'enquiries:status' %}" class="btn btn-secondary btn-block btn-lg" id="track-enquiry-landing-btn">
+        Track Existing Enquiry &rarr;
+      </a>
+    </div>
+
   </div>
+
+  <!-- Trust SLA Box -->
+  <div class="card" style="padding: 2rem; background: var(--slate-50); border: 1px dashed var(--slate-300); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+    <div>
+      <div style="font-weight: 700; color: var(--slate-900); font-size: 1.1rem;">SolarLink Export Quotation SLA Guarantee</div>
+      <div style="color: var(--slate-600); font-size: 0.9rem; margin-top: 0.25rem;">
+        Every valid project enquiry is guaranteed a preliminary engineering review and itemized commercial quote within 24 to 48 business hours.
+      </div>
+    </div>
+    <a href="{% url 'pages:about' %}#how-it-works" class="btn btn-outline btn-sm">
+      Read How It Works &rarr;
+    </a>
+  </div>
+
 </div>
 {% endblock %}

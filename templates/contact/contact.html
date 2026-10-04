@@ -1,15 +1,170 @@
 {% extends 'base.html' %}
 
-{% block title %}Contact & Support — SolarLink Global Export{% endblock %}
+{% block title %}Contact International Sales Desk & FAQ — SolarLink{% endblock %}
+{% block meta_description %}Contact SolarLink's global renewable equipment export desk or browse answers to frequently asked questions on quotations, Incoterms, and certifications.{% endblock %}
 
 {% block content %}
-<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
-  <div style="max-width: 800px; margin: 0 auto; text-align: center;">
-    <span class="badge badge-sun" style="margin-bottom: 1rem;">International Trade Inquiries</span>
-    <h1>Connect With Our Global Sales Desk</h1>
-    <p style="font-size: 1.15rem; color: var(--slate-600); margin-top: 1rem;">
-      Reach out for manufacturer direct quotations, container shipping logistics, and compliance document requests.
+<!-- Contact Hero -->
+<div style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); border-bottom: 1px solid var(--border-subtle); padding: 4rem 0 3rem;">
+  <div class="container" style="max-width: 860px; text-align: center;">
+    <span class="badge badge-sun" style="margin-bottom: 0.75rem;">Commercial Assistance & Trade Desk</span>
+    <h1 style="font-size: 2.75rem; line-height: 1.2; margin-bottom: 1rem; color: var(--slate-900);">
+      Connect With Our International Sales Engineers
+    </h1>
+    <p style="font-size: 1.2rem; color: var(--slate-600); line-height: 1.6; margin-bottom: 0;">
+      Reach out for manufacturer direct quotations, container shipping logistics, compliance document requests, or regional distribution partnerships.
     </p>
   </div>
+</div>
+
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 5rem;">
+  <div style="display: grid; grid-template-columns: 1fr 380px; gap: 3.5rem; align-items: start; margin-bottom: 5rem;">
+
+    <!-- Left: Working Contact Form -->
+    <div class="card" style="padding: 2.5rem; box-shadow: var(--shadow-md);">
+      <h2 style="font-size: 1.6rem; margin-bottom: 0.5rem;">Send a Direct Message</h2>
+      <p style="color: var(--slate-600); font-size: 0.95rem; margin-bottom: 2rem;">
+        Your message will be routed directly to the duty export sales manager responsible for your geographical territory.
+      </p>
+
+      <form method="post" action="{% url 'pages:contact' %}" novalidate id="contact-form">
+        {% csrf_token %}
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.full_name.id_for_label }}">Full Name *</label>
+            {{ form.full_name }}
+            {% if form.full_name.errors %}<div class="form-errors">{{ form.full_name.errors.0 }}</div>{% endif %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="{{ form.email.id_for_label }}">Business Email *</label>
+            {{ form.email }}
+            {% if form.email.errors %}<div class="form-errors">{{ form.email.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+          <div class="form-group">
+            <label class="form-label" for="{{ form.company.id_for_label }}">Company / Enterprise *</label>
+            {{ form.company }}
+            {% if form.company.errors %}<div class="form-errors">{{ form.company.errors.0 }}</div>{% endif %}
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="{{ form.phone.id_for_label }}">Direct Telephone / WhatsApp</label>
+            {{ form.phone }}
+            {% if form.phone.errors %}<div class="form-errors">{{ form.phone.errors.0 }}</div>{% endif %}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.subject.id_for_label }}">Inquiry Subject *</label>
+          {{ form.subject }}
+          {% if form.subject.errors %}<div class="form-errors">{{ form.subject.errors.0 }}</div>{% endif %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="{{ form.message.id_for_label }}">Detailed Message / Project Requirements *</label>
+          {{ form.message }}
+          {% if form.message.errors %}<div class="form-errors">{{ form.message.errors.0 }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" style="margin-top: 0.5rem;" id="submit-contact-btn">
+          Send Trade Inquiry &rarr;
+        </button>
+      </form>
+    </div>
+
+    <!-- Right: Office Details, WhatsApp & Support Channels -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <!-- Quick Contact Info -->
+      <div class="card" style="padding: 2rem;">
+        <h3 style="font-size: 1.25rem; margin-bottom: 1.25rem;">Global Sales Operations</h3>
+
+        <div style="display: flex; flex-direction: column; gap: 1.25rem; font-size: 0.9rem;">
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--primary-100); color: var(--primary-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div>
+              <strong style="color: var(--slate-900);">Global Headquarters</strong>
+              <div style="color: var(--slate-600); margin-top: 0.15rem;">SolarLink Trade GmbH<br>Friedrichstraße 120, 10117 Berlin, Germany</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--primary-100); color: var(--primary-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <div>
+              <strong style="color: var(--slate-900);">Regional Desk (Middle East & GCC)</strong>
+              <div style="color: var(--slate-600); margin-top: 0.15rem;">JAFZA One Tower, Jebel Ali Free Zone, Dubai, UAE</div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--accent-sun-100); color: var(--accent-sun-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <div>
+              <strong style="color: var(--slate-900);">Commercial Email</strong>
+              <div style="color: var(--slate-600); margin-top: 0.15rem;">
+                <a href="mailto:export@solarlink.io">export@solarlink.io</a><br>
+                <a href="mailto:sales@solarlink.io">sales@solarlink.io</a>
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; align-items: flex-start;">
+            <div style="width: 32px; height: 32px; border-radius: var(--radius-sm); background: var(--primary-100); color: var(--primary-700); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+              <strong style="color: var(--slate-900);">Business Hours</strong>
+              <div style="color: var(--slate-600); margin-top: 0.15rem;">Mon – Fri: 08:00 – 19:00 (UTC+1)<br>24/7 Container Tracking Desk</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp Quick Connect -->
+        <div style="margin-top: 1.75rem; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem;">
+          <a href="https://wa.me/493055441122" target="_blank" class="btn btn-accent btn-block" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <span>Direct WhatsApp Sales Desk</span> &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Frequently Asked Questions Accordion -->
+  <section id="faq">
+    <div style="text-align: center; max-width: 700px; margin: 0 auto 3rem;">
+      <span class="badge badge-primary" style="margin-bottom: 0.75rem;">Clear Answers</span>
+      <h2 style="font-size: 2.25rem; margin-bottom: 0.5rem;">Frequently Asked Questions</h2>
+      <p style="color: var(--slate-600); font-size: 1.05rem;">
+        Everything you need to know about bulk orders, quotation turnaround, ocean freight Incoterms, and certifications.
+      </p>
+    </div>
+
+    <div style="max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;">
+      {% for faq in faqs %}
+        <div class="card" style="padding: 1.5rem; border-radius: var(--radius-md);">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+            <div>
+              <span class="badge badge-sun" style="font-size: 0.7rem; margin-bottom: 0.4rem;">{{ faq.get_category_display }}</span>
+              <h3 style="font-size: 1.15rem; color: var(--slate-900); margin-bottom: 0.5rem;">
+                {{ faq.question }}
+              </h3>
+              <p style="color: var(--slate-600); font-size: 0.95rem; line-height: 1.6; margin: 0;">
+                {{ faq.answer }}
+              </p>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
 </div>
 {% endblock %}
