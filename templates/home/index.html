@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}SolarLink — Solar & Renewable Energy Equipment Export Catalog{% endblock %}
+
+{% block content %}
+<!-- Phase 1 Welcome Hero -->
+<section style="background: linear-gradient(180deg, #ffffff 0%, var(--bg-app) 100%); padding: 5rem 0 4rem; border-bottom: 1px solid var(--border-subtle);">
+  <div class="container" style="text-align: center; max-width: 860px;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.35rem 1rem; background: var(--primary-100); border-radius: var(--radius-full); margin-bottom: 1.5rem;">
+      <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--primary-600);"></span>
+      <span style="font-size: 0.85rem; font-weight: 700; color: var(--primary-800); text-transform: uppercase; letter-spacing: 0.05em;">Phase 1: Foundation & Auth Active</span>
+    </div>
+
+    <h1 style="font-size: 3.25rem; line-height: 1.15; margin-bottom: 1.5rem; color: var(--slate-900);">
+      Reliable Solar & Renewable Energy Equipment for <span class="logo-accent" style="background: linear-gradient(135deg, var(--primary-600), var(--accent-sun-500)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Global Projects</span>
+    </h1>
+
+    <p style="font-size: 1.25rem; color: var(--slate-600); line-height: 1.6; margin-bottom: 2.5rem;">
+      Connecting certified tier-1 manufacturers with international commercial buyers, EPC contractors, and distributors. Export-ready PV modules, hybrid inverters, and utility storage.
+    </p>
+
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg" id="hero-get-started-btn">
+        Register Buyer Account &rarr;
+      </a>
+      <a href="{% url 'accounts:login' %}" class="btn btn-secondary btn-lg" id="hero-sign-in-btn">
+        Access Member Portal
+      </a>
+    </div>
+
+    <!-- Quick Status Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-top: 4.5rem; text-align: left;">
+      <div class="card" style="padding: 1.25rem;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary-600); text-transform: uppercase;">Architecture</div>
+        <h4 style="margin: 0.25rem 0;">7 Modular Apps</h4>
+        <p style="font-size: 0.85rem; color: var(--slate-500); margin: 0;">Accounts, Catalog, Certs, Exports, Enquiries, Pages, Dashboard.</p>
+      </div>
+
+      <div class="card" style="padding: 1.25rem;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--accent-sun-600); text-transform: uppercase;">Security & Roles</div>
+        <h4 style="margin: 0.25rem 0;">Role-Based Access</h4>
+        <p style="font-size: 0.85rem; color: var(--slate-500); margin: 0;">Buyer, Sales Executive, and Admin permissions with custom profiles.</p>
+      </div>
+
+      <div class="card" style="padding: 1.25rem;">
+        <div style="font-size: 0.8rem; font-weight: 700; color: var(--primary-600); text-transform: uppercase;">Design System</div>
+        <h4 style="margin: 0.25rem 0;">Solar SaaS Theme</h4>
+        <p style="font-size: 0.85rem; color: var(--slate-500); margin: 0;">Emerald & Amber palette, soft shadows, rounded surfaces, micro-interactions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

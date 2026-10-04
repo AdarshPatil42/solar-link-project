@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Buyer Dashboard — SolarLink{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+      <span class="badge badge-primary">Buyer Portal</span>
+      <h1 style="margin-top: 0.5rem;">Welcome, {{ user.first_name|default:user.username }}</h1>
+      <p style="margin-bottom: 0;">{{ profile.company_name|default:'International Renewable Energy Buyer' }}</p>
+    </div>
+    <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Edit Profile</a>
+  </div>
+
+  <div class="card" style="padding: 2.5rem; text-align: center;">
+    <h3>Buyer Self-Service Portal Active</h3>
+    <p style="color: var(--slate-600); max-width: 600px; margin: 0.5rem auto 1.5rem;">
+      Your account is fully authenticated with <strong>Buyer</strong> privileges. The complete Wishlist, Enquiry Tracker (`ENQ-YYYY-XXXXX`), and Quotation Review system will be linked in Phase 4.
+    </p>
+    <a href="{% url 'pages:home' %}" class="btn btn-primary">Browse Solar Products</a>
+  </div>
+</div>
+{% endblock %}

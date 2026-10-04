@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Certifications & Compliance Standards — SolarLink{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
+  <div style="margin-bottom: 2rem;">
+    <h1>Compliance & Certifications Center</h1>
+    <p>International standard verification, quality certifications, and laboratory test reports.</p>
+  </div>
+  <div class="card" style="padding: 3rem; text-align: center;">
+    <h3>Certifications Directory</h3>
+    <p style="color: var(--slate-500);">Full compliance standards (IEC, UL, CE, ISO), lab reports, and warranty documents will be loaded in Phase 2.</p>
+    <a href="{% url 'pages:home' %}" class="btn btn-secondary">Return to Home</a>
+  </div>
+</div>
+{% endblock %}

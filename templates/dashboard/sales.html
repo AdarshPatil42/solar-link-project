@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Sales Executive Dashboard — SolarLink{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+      <span class="badge badge-sun">Sales Workspace</span>
+      <h1 style="margin-top: 0.5rem;">Sales Rep: {{ user.get_full_name|default:user.username }}</h1>
+      <p style="margin-bottom: 0;">SolarLink International Trade & Commercial Quotes</p>
+    </div>
+    <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Edit Profile</a>
+  </div>
+
+  <div class="card" style="padding: 2.5rem; text-align: center;">
+    <h3>Sales Executive Operations Active</h3>
+    <p style="color: var(--slate-600); max-width: 600px; margin: 0.5rem auto 1.5rem;">
+      Your account is authenticated with <strong>Sales Executive</strong> privileges. The assigned deals inbox, visual pipeline board, and dynamic Quotation Builder will be activated in Phase 4.
+    </p>
+    <a href="{% url 'pages:home' %}" class="btn btn-primary">Return to Homepage</a>
+  </div>
+</div>
+{% endblock %}

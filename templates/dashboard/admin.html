@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Administrator Operations Hub — SolarLink{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+      <span class="badge badge-primary">Administrator Hub</span>
+      <h1 style="margin-top: 0.5rem;">System Administration</h1>
+      <p style="margin-bottom: 0;">Full governance over catalog, users, quotations, and CSV reporting</p>
+    </div>
+    <div style="display:flex;gap:0.75rem;">
+      <a href="/admin/" target="_blank" class="btn btn-secondary">Django Admin &rarr;</a>
+      <a href="{% url 'accounts:profile' %}" class="btn btn-secondary">Edit Profile</a>
+    </div>
+  </div>
+
+  <div class="card" style="padding: 2.5rem; text-align: center;">
+    <h3>Administrator Control Active</h3>
+    <p style="color: var(--slate-600); max-width: 600px; margin: 0.5rem auto 1.5rem;">
+      Your account has full <strong>Administrator</strong> privileges. Executive KPI analytics and 5x CSV Data Exports will be linked in Phase 5.
+    </p>
+    <a href="/admin/" target="_blank" class="btn btn-primary">Open Django Admin Panel</a>
+  </div>
+</div>
+{% endblock %}

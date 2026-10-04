@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Product Catalog — SolarLink{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
+  <div style="margin-bottom: 2rem;">
+    <h1>Product Catalog</h1>
+    <p>Browse tier-1 solar modules, inverters, lithium batteries, and renewable energy equipment.</p>
+  </div>
+  <div class="card" style="padding: 3rem; text-align: center;">
+    <h3>Catalog Module</h3>
+    <p style="color: var(--slate-500);">Full product catalog, EAV dynamic specifications, and multi-dimensional search will be activated in Phase 2.</p>
+    <a href="{% url 'pages:home' %}" class="btn btn-secondary">Return to Home</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile — SolarLink Export Portal{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3rem; padding-bottom: 4rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <div>
+      <h1>Account Profile</h1>
+      <p style="margin-bottom: 0;">Manage your personal details, business contact, and trade preferences.</p>
+    </div>
+    <a href="{% url 'accounts:dashboard_redirect' %}" class="btn btn-secondary">
+      &larr; Back to Dashboard
+    </a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 320px 1fr; gap: 2rem;">
+    <!-- Profile Card Summary -->
+    <div class="card" style="height: fit-content;">
+      <div class="card-body" style="text-align: center; padding: 2rem 1.5rem;">
+        <div style="width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, var(--primary-600), var(--accent-sun-500)); color: white; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; margin: 0 auto 1rem;">
+          {{ user.username|slice:":1"|upper }}
+        </div>
+        <h3 style="margin-bottom: 0.25rem;">{{ user.get_full_name|default:user.username }}</h3>
+        <p style="font-size: 0.85rem; color: var(--slate-500); margin-bottom: 1rem;">@{{ user.username }}</p>
+        
+        <div>
+          <span class="badge badge-primary">{{ profile.get_role_display }}</span>
+        </div>
+
+        <div style="margin-top: 1.5rem; text-align: left; border-top: 1px solid var(--border-subtle); padding-top: 1.25rem; font-size: 0.9rem;">
+          <div style="margin-bottom: 0.75rem;">
+            <div style="color: var(--slate-500); font-size: 0.75rem; text-transform: uppercase;">Company</div>
+            <div style="font-weight: 600; color: var(--slate-800);">{{ profile.company_name|default:'Not provided' }}</div>
+          </div>
+          <div style="margin-bottom: 0.75rem;">
+            <div style="color: var(--slate-500); font-size: 0.75rem; text-transform: uppercase;">Country</div>
+            <div style="font-weight: 600; color: var(--slate-800);">{{ profile.country|default:'Global / Unspecified' }}</div>
+          </div>
+          <div>
+            <div style="color: var(--slate-500); font-size: 0.75rem; text-transform: uppercase;">Member Since</div>
+            <div style="font-weight: 600; color: var(--slate-800);">{{ user.date_joined|date:"F Y" }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Profile Form -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Edit Personal & Company Information</h3>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data" id="profile-edit-form">
+          {% csrf_token %}
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="{{ form.first_name.id_for_label }}">First Name</label>
+              {{ form.first_name }}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="{{ form.last_name.id_for_label }}">Last Name</label>
+              {{ form.last_name }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="{{ form.email.id_for_label }}">Email Address</label>
+            {{ form.email }}
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="{{ form.company_name.id_for_label }}">Company / Enterprise</label>
+              {{ form.company_name }}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="{{ form.job_title.id_for_label }}">Job Title / Position</label>
+              {{ form.job_title }}
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="{{ form.country.id_for_label }}">Country of Operation</label>
+              {{ form.country }}
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="{{ form.phone.id_for_label }}">Direct Telephone / WhatsApp</label>
+              {{ form.phone }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="{{ form.bio.id_for_label }}">Professional Bio & Procurement Scope</label>
+            {{ form.bio }}
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="save-profile-btn">
+            Save Profile Updates
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

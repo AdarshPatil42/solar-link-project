@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Export Information & Shipping Logistics — SolarLink{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
+  <div style="margin-bottom: 2rem;">
+    <h1>Export & Global Logistics</h1>
+    <p>International Incoterms, containerized shipping guidelines, and export documentation checklists.</p>
+  </div>
+  <div class="card" style="padding: 3rem; text-align: center;">
+    <h3>Export Information Hub</h3>
+    <p style="color: var(--slate-500);">Incoterms (EXW, FOB, CFR, CIF, DAP, DDP), countries served, and export document templates will be active in Phase 2.</p>
+    <a href="{% url 'pages:home' %}" class="btn btn-secondary">Return to Home</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Project Enquiry & Request Quote — SolarLink{% endblock %}
+
+{% block content %}
+<div class="container" style="padding-top: 3.5rem; padding-bottom: 4rem;">
+  <div style="margin-bottom: 2rem;">
+    <h1>Commercial Project Enquiries & Bulk RFQ</h1>
+    <p>Submit your renewable energy equipment specifications for custom export pricing.</p>
+  </div>
+  <div class="card" style="padding: 3rem; text-align: center;">
+    <h3>Enquiry & Quotation System</h3>
+    <p style="color: var(--slate-500);">Interactive Project Enquiry, Multi-Item Bulk RFQ, and tracking by ENQ-YYYY-XXXXX will be operational in Phase 3.</p>
+    <a href="{% url 'pages:home' %}" class="btn btn-secondary">Return to Home</a>
+  </div>
+</div>
+{% endblock %}

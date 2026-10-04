@@ -1,0 +1,66 @@
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="brand-logo" style="color: #ffffff;">
+          <div class="brand-icon-wrapper">
+            <svg style="width:20px;height:20px;" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L14.39 8.26L21 9.27L16.5 14.14L17.77 21L12 17.77L6.23 21L7.5 14.14L3 9.27L9.61 8.26L12 2Z"/>
+            </svg>
+          </div>
+          <span>Solar<span class="logo-accent">Link</span></span>
+        </div>
+        <p>
+          Global export catalog connecting renewable energy manufacturers with international buyers, EPC contractors, and distributors worldwide.
+        </p>
+        <div style="display:flex;gap:0.75rem;margin-top:1.5rem;">
+          <span class="badge badge-primary">IEC Certified</span>
+          <span class="badge badge-sun">Global Logistics</span>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Product Range</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'catalog:list' %}?category=solar-panels">Solar PV Panels</a></li>
+          <li><a href="{% url 'catalog:list' %}?category=solar-inverters">Hybrid & On-Grid Inverters</a></li>
+          <li><a href="{% url 'catalog:list' %}?category=solar-batteries">Lithium Battery Systems</a></li>
+          <li><a href="{% url 'catalog:list' %}?category=solar-mounting-systems">Mounting Structures</a></li>
+          <li><a href="{% url 'catalog:list' %}?category=solar-pumps">Solar Water Pumps</a></li>
+          <li><a href="{% url 'catalog:list' %}">Complete Catalog &rarr;</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Compliance & Trade</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'certifications:index' %}">Compliance Standards</a></li>
+          <li><a href="{% url 'certifications:index' %}#lab-reports">Verified Lab Reports</a></li>
+          <li><a href="{% url 'exports:info' %}">Incoterms & Shipping</a></li>
+          <li><a href="{% url 'exports:info' %}#destinations">Countries Served</a></li>
+          <li><a href="{% url 'exports:info' %}#documents">Export Documentation</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Company & Support</h4>
+        <ul class="footer-links">
+          <li><a href="{% url 'pages:about' %}">About SolarLink</a></li>
+          <li><a href="{% url 'pages:about' %}#how-it-works">How It Works</a></li>
+          <li><a href="{% url 'pages:about' %}#team">Leadership & Sales Team</a></li>
+          <li><a href="{% url 'pages:contact' %}">Contact Sales Office</a></li>
+          <li><a href="{% url 'pages:contact' %}#faq">Frequently Asked Questions</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>&copy; 2026 SolarLink Global Export Catalog. All international trade rights reserved.</div>
+      <div style="display:flex;gap:1.5rem;">
+        <a href="{% url 'pages:about' %}">Privacy Policy</a>
+        <a href="{% url 'pages:about' %}">Terms of Export</a>
+        <a href="{% url 'pages:contact' %}">Security & Compliance</a>
+      </div>
+    </div>
+  </div>
+</footer>
